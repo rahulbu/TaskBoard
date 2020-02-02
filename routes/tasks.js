@@ -18,6 +18,21 @@ router.get('/:id/tasks',(req,res)=>{
         })
 });
 
+router.get('/:id/alltasks',(req,res)=>{
+    knex('tasks')
+        .where({
+            assignee: req.params.id
+        }).orWhere({
+            report_to: req.params.id
+        }).then(rows=>{
+            // res.statusCode(200);
+            res.json(rows);
+        }).catch(error=>{
+            res.statusCode(401)
+            res.redirect("back");
+        })
+})
+
 router.get('/:id/tasks/new',(req,res)=>{
     res.send("new task form");
 });
@@ -57,6 +72,7 @@ router.get('/:id/tasks/team/:teamId',(req,res)=>{
         .join('tasks',{'team_members.user_id':'tasks.assignee'})
         .join('users',{'users.id':'team_members.user_id'})
         .select('users.Name','tasks.name','tasks.description','tasks.progress')
+        .whereIn('report_to', knex.select('user_id').from('team_members').where({team_id: req.params.teamId}))
         .where({
             team_id: req.params.teamId
         }).then(rows=>{
@@ -68,8 +84,10 @@ router.get('/:id/tasks/:task_id',(req,res)=>{
     // console.log(req.params.task_id);
     knex('tasks')
         .where({
-            id : req.params.task_id
-        }).then(rows=>{
+            id : req.params.task_id,
+            assignee: req.params.id
+        })
+        .orWhere({id : req.params.task_id, report_to: req.params.id}).then(rows=>{
             res.json(rows);
         }).catch(error=>{
             res.statusCode(401);

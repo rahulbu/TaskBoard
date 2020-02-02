@@ -48,7 +48,7 @@ router.get('/:id/team/:team_id',(req,res)=>{
         .join('users',{'users.id':'team_members.user_id'})
         .join('team',{'team.id':'team_members.team_id'})
         .select('users.Name','team.name')
-        .havingNull('safe_delete')
+        .whereNull('team_members.safe_delete')
         .where({
             'team_members.team_id' : req.params.team_id
         }).then(rows=>{
