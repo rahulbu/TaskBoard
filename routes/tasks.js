@@ -1,14 +1,20 @@
 const router = require('express').Router();
 const knex = require('./../db/index');
+// const passport = require('passport');
+// var middleware = require('./../middleware/index');
 
 router.get('/:id/tasks',(req,res)=>{
+    console.log(req.user);
     knex('tasks')
         .where({
             assignee: req.params.id
         }).then(rows=>{
-            res.json(rows)
+            console.log(rows);
+            res.json(rows);
         }).catch(error=>{
             console.log("error");
+            res.statusCode(400);
+            res.redirect("back");
         })
 });
 
@@ -17,7 +23,33 @@ router.get('/:id/tasks/new',(req,res)=>{
 });
 
 router.post('/:id/tasks/new',(req,res)=>{
-    res.send("posting new task .");
+
+    let name = req.body.name,
+        priority = req.body.priority,
+        description = req.body.description,
+        progress = req.body.progress,
+        dueDate = req.body.dueDate,
+        assignee = req.body.assignee,
+        reportTo = req.params.id;
+        progressRecordedOn = knex.fn.now();
+        knex('tasks')
+            .insert({
+                name: name,
+                priority: priority,
+                description: description,
+                progress: progress,
+                due_date: dueDate,
+                assignee: assignee,
+                report_to: reportTo,
+                progress_recorded_on: progress_recorded_on
+            }).then(res=>{
+                console.log(res);
+                res.statusCode(201);
+                res.redirect("/user/"+req.params.id+"/tasks");
+            }).catch(error=>{
+                res.statusCode(400);
+                res.redirect("back");
+            })
 });
 
 router.get('/:id/tasks/team/:teamId',(req,res)=>{
@@ -39,15 +71,43 @@ router.get('/:id/tasks/:task_id',(req,res)=>{
             id : req.params.task_id
         }).then(rows=>{
             res.json(rows);
+        }).catch(error=>{
+            res.statusCode(401);
+            
         });
 });
 
 router.get('/:id/tasks/:task_id/update',(req,res)=>{
-    res.send("update or edit task")
+    // res.send("update or edit task")
+    knex('tasks')
+        .where({id: req.params.task_id})
+        .then(rows=>{
+            res.json(rows);
+        }).catch(error=>{
+            // res.statusCode(401);
+            res.sendStatus(401);
+        })
 })
 
-router.post('/:id/tasks/:task_id/update',(req,res)=>{
-    res.send("posting");
+router.put('/:id/tasks/:task_id/update',(req,res)=>{
+    // res.send("posting");
+
+    let progress = req.body.progress,
+        progressRecordedOn = knex.fn.now();
+
+    knex('tasks')
+        .update({
+            progress: progress,
+            progress_recorded_on: progressRecordedOn
+        })
+        .where({id: req.params.task_id})
+        .then(rows=>{
+            res.sendStatus(202)
+
+        }).catch(error=>{
+            // res.statusCode(401);
+            res.sendStatus(401);
+        })
 });
 
 

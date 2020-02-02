@@ -1,13 +1,24 @@
 var middleware = {};
 
-middleware.isLoggedIn = (req,res,next)=>{
+middleware.isLoggedIn = function(req,res,next){
     console.log('checking logged in');
-    next();
+    // console.log(req);
+    if(req.isAuthenticated())
+        return next();
+    else {
+        res.redirect("/");
+    }
 }
 
 middleware.isAdmin = (req,res,next)=>{
     console.log('checking for admin');
-    next();
+    if(req.isAuthenticated()){
+        if(req.user.role == "admin"){
+            return next();
+        }else{
+            res.sendStatus(401);
+        }
+    }else res.redirect('/');
 }
 
 
