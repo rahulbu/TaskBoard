@@ -1,5 +1,6 @@
-//////////////////////////////////////
-/* 
+
+    // local setup 
+
 const config = require('./../.config')
 
 
@@ -16,27 +17,17 @@ const knex = require('knex')({
     },
     fetchAsString: ['number','date'],
 });
-*////////////////////////////
 
+
+
+    /// production 
+/*
 const knex = require('knex')({
-    // client: 'pg',
-    // connection: process.env.DATABASE_URL,
-    // ssl:true,
-    // pool: {
-    //     min: 1, max:10
-    // },
     client: 'pg',
-  connection: process.env.DATABASE_URL,
-//   searchPath: 'knex,public',
-  pool: { min: 1, max: 7 }
-    // fetchAsString: ['number','date'],
+    connection: process.env.DATABASE_URL,
+    ssl:true,
+    pool: { min: 1, max: 7 }
 });
-
-// knex('users').then(rows =>{
-//     console.log(rows);
-// })
-
-// console.log(result);
-// console.log("done!")
+*/
 
 module.exports = knex;

@@ -5,6 +5,14 @@ const middleware = require('./../middleware/index');
 
 router.get('/:id/team/new',middleware.isAdmin,(req,res)=>{
     res.send("new team creation page");
+    knex('users')
+        .select('id','name')
+        .then(rows=>{
+            res.json(rows);
+        }).catch(err=>{
+            console.log("team error 0");
+            res.sendStatus(400);
+        })
 });
 
 router.post('/:id/team/new',middleware.isAdmin,(req,res)=>{
@@ -21,7 +29,6 @@ router.post('/:id/team/new',middleware.isAdmin,(req,res)=>{
         })
         .returning('id')
         .then(row_id=>{
-            console.log(row_id);
             
             let fieldsToInsert = req.body.users.map(field => 
                 ({ user_id: field, team_id: row_id })); 
@@ -31,12 +38,11 @@ router.post('/:id/team/new',middleware.isAdmin,(req,res)=>{
                 .then(rows=>{
                     res.sendStatus(201);
                 }).catch(error=>{
+                    console.log("team error 1");
                     res.sendStatus(401);
                 })
-
-            // res.sendStatus(201);
-
         }).catch(error=>{
+            console.log("team error 2");
             res.sendStatus(401);
         })
 
@@ -54,6 +60,9 @@ router.get('/:id/team/:team_id',middleware.isLoggedIn,(req,res)=>{
             'team_members.team_id' : req.params.team_id
         }).then(rows=>{
             res.json(rows);
+        }).catch(err=>{
+            console.log("team error 3");
+            res.sendStatus(400);
         })
 });
 
@@ -65,6 +74,7 @@ router.delete('/:id/team/:team_id/delete',middleware.isAdmin,(req,res)=>{
             res.statusCode(200);
             res.send("deletion in process");
         }).catch(error=>{
+            console.log("team error 4");
             res.sendStatus(401);
         })
 });

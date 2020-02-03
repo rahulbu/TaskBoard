@@ -8,7 +8,6 @@ const express = require('express'),
     methodOverride = require('method-override'),
     knex = require('./db/index'),
     customFunctions = require('./middleware/customFunctions'),
-    // crypto = require('crypto'),
     app = express();
 
 
@@ -58,14 +57,9 @@ passport.use(new localStrategy({
     })
 }));
 passport.serializeUser((user,done)=>{
-    console.log("serializing ...")
-    console.log(user.id)
     done(null,user);
 })
 passport.deserializeUser((user,done)=>{
-    console.log(user);
-
-    console.log("De... Serializing...")
     knex('users').where({id : user.id})
     .select('id','name','role')
     .whereNull('safe_delete')
@@ -87,8 +81,6 @@ app.use(function(req,res,next){
     next();
 })
 
-
-
 app.use('/',indexRoutes);
 app.use('/user',tasksRoutes);
 app.use('/user',userRoutes);
@@ -99,14 +91,15 @@ app.get('/',(req,res)=>{
     res.sendFile(__dirname+"/login.html")
 })
 app.get('/userNew',(req,res)=>{
+    console.log(req.user);
     res.sendFile(__dirname+"/newUser.html")
 })
 
 app.get('*',(req,res)=>{
-    res.send("try using correct paths");
+    res.redirect("/");
 });
 
-app.listen(process.env.PORT , process.env.IP ,(error)=>{
+app.listen(process.env.PORT || 3000, process.env.IP || '127.0.0.1',(error)=>{
     if (error)
         console.log("server not found.");
     else 

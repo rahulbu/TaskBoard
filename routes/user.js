@@ -4,7 +4,7 @@ const router = require('express').Router(),
       knex = require('../db/index');
 
 router.get('/new',middleware.isAdmin,(req,res)=>{
-    // res.send('new user registration page');
+
     res.redirect("/userNew");
 })
 
@@ -17,8 +17,7 @@ router.post('/new',middleware.isAdmin,(req,res)=>{
         role = req.body.role,
         salt = crypto.randomBytes(4).toString('hex'),
         password = crypto.pbkdf2Sync(req.body.password,salt,100,128,'sha512').toString('hex');
-        console.log(password)
-        console.log(salt);
+
         knex('users')
             .insert({
                 id: id, name: name, email: email, phone: phone, role: role, salt: salt, password: password
@@ -26,28 +25,44 @@ router.post('/new',middleware.isAdmin,(req,res)=>{
                 res.sendStatus(201);
                 console.log("added user")
             }).catch(error=>{
-                res.sendStatus(401);
+                res.sendStatus(400);
+                console.log("user error 1");
                 console.log(error.sqlMessage);
             })
 })
 
 router.get('/:id',middleware.isLoggedIn,(req,res)=>{
     knex('users')
-        // .havingNull('safe_delete')
+        // .whereNull('safe_delete')
+        .select('id','name','phone','email','role')
         .where({
             id: req.params.id
         }).then(rows=>{
             res.send(rows);
         }).catch(error=>{
             console.log('no such record');
+            console.log("user error 2");
             res.sendStatus(400);
         });
 });
 
 router.get('/:id/edit',middleware.isLoggedIn,(req,res)=>{
     
-    
-    res.send("edit page");
+    /// edit parameters
+
+
+    knex('user')
+    .select('id','name','phone','email')
+    .where({
+        id: req.params.id
+    }).then(rows=>{
+        res.send(rows);
+    }).catch(error=>{
+        console.log('no such record');
+        console.log("user error 3");
+        res.sendStatus(400);
+    });
+
 });
 
 router.put('/:id/edit',middleware.isLoggedIn,(req,res)=>{
@@ -67,6 +82,7 @@ router.put('/:id/edit',middleware.isLoggedIn,(req,res)=>{
                         res.statusCode(201)
                         res.send("updated");
                     }).catch(err=>{
+                        console.log("user error 4");
                         res.statusCode(401);
                         res.redirect("back");
                     })
@@ -77,6 +93,7 @@ router.put('/:id/edit',middleware.isLoggedIn,(req,res)=>{
             }
         }).catch(error=>{
             console.log("error in password");
+            console.log("user error 5");
             res.redirect('/'); 
         })
 
@@ -92,6 +109,7 @@ router.delete('/:id/delete',middleware.isAdmin,(req,res)=>{
             res.redirect('/');
         }).catch(err=>{
             res.statusCode(401);
+            console.log("user error 6");
             res.send("error")
         });
 });
