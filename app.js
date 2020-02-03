@@ -8,6 +8,7 @@ const express = require('express'),
     methodOverride = require('method-override'),
     knex = require('./db/index'),
     customFunctions = require('./middleware/customFunctions'),
+    // crypto = require('crypto'),
     app = express();
 
 
@@ -38,13 +39,13 @@ passport.use(new localStrategy({
     passwordField : 'password',
 },function(username,password,done){
     knex('users')
-    .select('id','password','role')
+    .select('id','password','role','salt')
     .where({ id : username})
     .whereNull('safe_delete')
     .then(rows=>{
         console.log(rows[0]);
         if(rows[0]){
-            if(password == rows[0].password)
+            if(customFunctions.verifyPassword(password,rows[0].password,rows[0].salt))
                 return done(null,rows[0]);
             else 
                 return done(null,false,{message : "incorrect password"});
@@ -95,9 +96,10 @@ app.use('/user',teamRoutes);
 
 
 app.get('/',(req,res)=>{
-    // res.redirect("/login");
-
     res.sendFile(__dirname+"/login.html")
+})
+app.get('/userNew',(req,res)=>{
+    res.sendFile(__dirname+"/newUser.html")
 })
 
 app.get('*',(req,res)=>{

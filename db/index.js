@@ -1,5 +1,5 @@
 const config = require('./../.config')
-/*
+
 const knex = require('knex')({
     client: 'mysql',
     connection:{
@@ -13,7 +13,8 @@ const knex = require('knex')({
     },
     fetchAsString: ['number','date'],
 });
-*/
+
+/*
 const knex = require('knex')({
     client: 'pg',
     connectionString: process.env.DATABASE_URL,
@@ -22,7 +23,7 @@ const knex = require('knex')({
         min: 0, max:7
     },
     fetchAsString: ['number','date'],
-});
+});*/
 
 // knex('users').then(rows =>{
 //     console.log(rows);

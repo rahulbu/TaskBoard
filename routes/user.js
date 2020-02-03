@@ -4,7 +4,8 @@ const router = require('express').Router(),
       knex = require('../db/index');
 
 router.get('/new',middleware.isAdmin,(req,res)=>{
-    res.send('new user registration page');
+    // res.send('new user registration page');
+    res.redirect("/userNew");
 })
 
 router.post('/new',middleware.isAdmin,(req,res)=>{
@@ -14,16 +15,19 @@ router.post('/new',middleware.isAdmin,(req,res)=>{
         email = req.body.email,
         phone = req.body.phone,
         role = req.body.role,
-        salt = crypto.randomBytes(6).toString('hex'),
+        salt = crypto.randomBytes(4).toString('hex'),
         password = crypto.pbkdf2Sync(req.body.password,salt,100,128,'sha512').toString('hex');
-
+        console.log(password)
+        console.log(salt);
         knex('users')
             .insert({
                 id: id, name: name, email: email, phone: phone, role: role, salt: salt, password: password
             }).then(rows=>{
                 res.sendStatus(201);
+                console.log("added user")
             }).catch(error=>{
                 res.sendStatus(401);
+                console.log(error.sqlMessage);
             })
 })
 
