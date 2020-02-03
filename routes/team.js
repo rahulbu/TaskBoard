@@ -48,8 +48,8 @@ router.get('/:id/team/:team_id',middleware.isLoggedIn,(req,res)=>{
     knex('team_members')
         .join('users',{'users.id':'team_members.user_id'})
         .join('team',{'team.id':'team_members.team_id'})
-        .select('users.Name','team.name')
-        .whereNull('team_members.safe_delete')
+        .select('users.name','team.name')
+        // .whereNull('team_members.safe_delete')
         .where({
             'team_members.team_id' : req.params.team_id
         }).then(rows=>{
