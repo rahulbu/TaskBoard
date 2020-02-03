@@ -1,6 +1,8 @@
+//////////////////////////////////////
+/* 
 const config = require('./../.config')
 
-/*
+
 const knex = require('knex')({
     client: 'mysql',
     connection:{
@@ -14,7 +16,7 @@ const knex = require('knex')({
     },
     fetchAsString: ['number','date'],
 });
-*/
+*////////////////////////////
 
 const knex = require('knex')({
     client: 'pg',
