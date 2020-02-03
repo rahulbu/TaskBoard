@@ -1,12 +1,13 @@
 const knex = require('./../db/index');
 const router= require('express').Router();
+const middleware = require('./../middleware/index');
 
 
-router.get('/:id/team/new',(req,res)=>{
+router.get('/:id/team/new',middleware.isAdmin,(req,res)=>{
     res.send("new team creation page");
 });
 
-router.post('/:id/team/new',(req,res)=>{
+router.post('/:id/team/new',middleware.isAdmin,(req,res)=>{
 
     let name= req.body.name,
         description = req.sanitize(req.body.description),
@@ -43,7 +44,7 @@ router.post('/:id/team/new',(req,res)=>{
     res.send("creation of new team");
 });
 
-router.get('/:id/team/:team_id',(req,res)=>{
+router.get('/:id/team/:team_id',middleware.isLoggedIn,(req,res)=>{
     knex('team_members')
         .join('users',{'users.id':'team_members.user_id'})
         .join('team',{'team.id':'team_members.team_id'})
@@ -56,7 +57,7 @@ router.get('/:id/team/:team_id',(req,res)=>{
         })
 });
 
-router.delete('/:id/team/:team_id/delete',(req,res)=>{
+router.delete('/:id/team/:team_id/delete',middleware.isAdmin,(req,res)=>{
     knex('tasks')
         .update({ safe_delete: knex.fn.now()})
         .where({ id: req.params.team_id})

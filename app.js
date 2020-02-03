@@ -1,5 +1,4 @@
-const express = require('express')
-    app = express(),
+const express = require('express'),
     bodyParser = require('body-parser'),
     helmet = require('helmet'),
     passport = require('passport'),
@@ -8,8 +7,12 @@ const express = require('express')
     expressSanitizer = require('express-sanitizer'),
     methodOverride = require('method-override'),
     knex = require('./db/index'),
-    customFunctions = require('./middleware/customFunctions');
+    customFunctions = require('./middleware/customFunctions'),
+    app = express();
 
+
+
+app.use(helmet())
 
 const tasksRoutes = require('./routes/tasks'),
         indexRoutes = require('./routes/index'),
@@ -17,7 +20,6 @@ const tasksRoutes = require('./routes/tasks'),
        teamRoutes = require('./routes/team');
 
 
-app.use(helmet())
 app.use(bodyParser.urlencoded({extended:true}));
 // app.use(express.static('./'))
 app.use(expressSanitizer());
@@ -26,14 +28,14 @@ app.use(methodOverride("__method"));
 app.use(expressSession({
     secret: "hola",
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
 }))
 
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new localStrategy({
     usernameField : 'id',
-    passwordField : 'password'
+    passwordField : 'password',
 },function(username,password,done){
     knex('users')
     .select('id','password','role')
@@ -69,16 +71,16 @@ passport.deserializeUser((user,done)=>{
     .then(rows=>{
         console.log("logging length")
         console.log(rows[0]);
-        done(rows[0]);
+        done(null,rows[0]);
     }).catch(error=>{
-        done(error);
+        return done(error);
     })
 })
 
 
 app.use(function(req,res,next){
     res.locals.user =req.user;
-    //  console.log("2"+req.user);
+     console.log("2"+req.user);
     // res.locals.error = req.flash("error","");
     // res.locals.success = req.flash("success","");
     next();

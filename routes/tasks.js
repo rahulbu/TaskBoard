@@ -1,9 +1,8 @@
 const router = require('express').Router();
 const knex = require('./../db/index');
-// const passport = require('passport');
-// var middleware = require('./../middleware/index');
+var middleware = require('./../middleware/index');
 
-router.get('/:id/tasks',(req,res)=>{
+router.get('/:id/tasks',middleware.isLoggedIn,(req,res)=>{
     console.log(req.user);
     knex('tasks')
         .where({
@@ -18,7 +17,7 @@ router.get('/:id/tasks',(req,res)=>{
         })
 });
 
-router.get('/:id/alltasks',(req,res)=>{
+router.get('/:id/alltasks',middleware.isLoggedIn,(req,res)=>{
     knex('tasks')
         .where({
             assignee: req.params.id
@@ -33,11 +32,11 @@ router.get('/:id/alltasks',(req,res)=>{
         })
 })
 
-router.get('/:id/tasks/new',(req,res)=>{
+router.get('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{
     res.send("new task form");
 });
 
-router.post('/:id/tasks/new',(req,res)=>{
+router.post('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{
 
     let name = req.body.name,
         priority = req.body.priority,
@@ -67,7 +66,7 @@ router.post('/:id/tasks/new',(req,res)=>{
             })
 });
 
-router.get('/:id/tasks/team/:teamId',(req,res)=>{
+router.get('/:id/tasks/team/:teamId',middleware.isLoggedIn,(req,res)=>{
     knex('team_members')
         .join('tasks',{'team_members.user_id':'tasks.assignee'})
         .join('users',{'users.id':'team_members.user_id'})
@@ -80,7 +79,7 @@ router.get('/:id/tasks/team/:teamId',(req,res)=>{
         })
 });
 
-router.get('/:id/tasks/:task_id',(req,res)=>{
+router.get('/:id/tasks/:task_id',middleware.isLoggedIn,(req,res)=>{
     // console.log(req.params.task_id);
     knex('tasks')
         .where({
@@ -95,7 +94,7 @@ router.get('/:id/tasks/:task_id',(req,res)=>{
         });
 });
 
-router.get('/:id/tasks/:task_id/update',(req,res)=>{
+router.get('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{
     // res.send("update or edit task")
     knex('tasks')
         .where({id: req.params.task_id})
@@ -107,7 +106,7 @@ router.get('/:id/tasks/:task_id/update',(req,res)=>{
         })
 })
 
-router.put('/:id/tasks/:task_id/update',(req,res)=>{
+router.put('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{
     // res.send("posting");
 
     let progress = req.body.progress,

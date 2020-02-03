@@ -1,13 +1,13 @@
 const router = require('express').Router(),
-    //   middleware = require('./../middleware/index'),
+      middleware = require('./../middleware/index'),
       crypto = require('crypto'),
       knex = require('../db/index');
 
-router.get('/new',(req,res)=>{
+router.get('/new',middleware.isAdmin,(req,res)=>{
     res.send('new user registration page');
 })
 
-router.post('/new', (req,res)=>{
+router.post('/new',middleware.isAdmin,(req,res)=>{
 
     let id = req.body.id,
         name = req.body.name,
@@ -25,12 +25,9 @@ router.post('/new', (req,res)=>{
             }).catch(error=>{
                 res.sendStatus(401);
             })
-
-    // res.status(201);
-    // res.send("new user created.")
 })
 
-router.get('/:id',(req,res)=>{
+router.get('/:id',middleware.isLoggedIn,(req,res)=>{
     knex('users')
         .havingNull('safe_delete')
         .where({
@@ -43,14 +40,14 @@ router.get('/:id',(req,res)=>{
         });
 });
 
-router.get('/:id/edit',(req,res)=>{
+router.get('/:id/edit',middleware.isLoggedIn,(req,res)=>{
     
     
     res.send("edit page");
 });
 
-router.put('/:id/edit',(req,res)=>{
-    // res.send("edit processing");
+router.put('/:id/edit',middleware.isLoggedIn,(req,res)=>{
+    
     let oldPassword = req.body.oldPassword,
         newPassword = req.body.newPassword;
     knex('users')
@@ -81,8 +78,8 @@ router.put('/:id/edit',(req,res)=>{
 
 });
 
-router.delete('/:id/delete',(req,res)=>{
-    // res.send("deletion");
+router.delete('/:id/delete',middleware.isAdmin,(req,res)=>{
+    
     knex('users')
         .update({safe_delete: knex.fn.now()})
         .where({id: req.params.id})
