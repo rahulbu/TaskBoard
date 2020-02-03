@@ -19,12 +19,16 @@ const knex = require('knex')({
 *////////////////////////////
 
 const knex = require('knex')({
+    // client: 'pg',
+    // connection: process.env.DATABASE_URL,
+    // ssl:true,
+    // pool: {
+    //     min: 1, max:10
+    // },
     client: 'pg',
-    connectionString: process.env.DATABASE_URL,
-    ssl:true,
-    pool: {
-        min: 1, max:10
-    },
+  connection: process.env.DATABASE_URL,
+//   searchPath: 'knex,public',
+  pool: { min: 1, max: 7 }
     // fetchAsString: ['number','date'],
 });
 
