@@ -70,7 +70,7 @@ router.get('/:id/tasks/team/:teamId',middleware.isLoggedIn,(req,res)=>{
     knex('team_members')
         .join('tasks',{'team_members.user_id':'tasks.assignee'})
         .join('users',{'users.id':'team_members.user_id'})
-        .select('users.Name','tasks.name','tasks.description','tasks.progress')
+        .select('users.name','tasks.name','tasks.description','tasks.progress')
         .whereIn('report_to', knex.select('user_id').from('team_members').where({team_id: req.params.teamId}))
         .where({
             team_id: req.params.teamId
