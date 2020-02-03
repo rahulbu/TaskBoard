@@ -23,7 +23,7 @@ const knex = require('knex')({
     connectionString: process.env.DATABASE_URL,
     ssl:true,
     pool: {
-        min: 0, max:7
+        min: 1, max:10
     },
     // fetchAsString: ['number','date'],
 });
