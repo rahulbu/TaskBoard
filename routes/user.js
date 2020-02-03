@@ -33,14 +33,14 @@ router.post('/new',middleware.isAdmin,(req,res)=>{
 
 router.get('/:id',middleware.isLoggedIn,(req,res)=>{
     knex('users')
-        .havingNull('safe_delete')
+        // .havingNull('safe_delete')
         .where({
             id: req.params.id
         }).then(rows=>{
             res.send(rows);
         }).catch(error=>{
             console.log('no such record');
-            res.sendStatus(401);
+            res.sendStatus(400);
         });
 });
 
