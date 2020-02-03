@@ -25,7 +25,7 @@ const knex = require('knex')({
     pool: {
         min: 0, max:7
     },
-    fetchAsString: ['number','date'],
+    // fetchAsString: ['number','date'],
 });
 
 // knex('users').then(rows =>{
