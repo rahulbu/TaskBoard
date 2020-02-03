@@ -106,7 +106,7 @@ app.get('*',(req,res)=>{
     res.send("try using correct paths");
 });
 
-app.listen(3000, 'localhost',(error)=>{
+app.listen(process.env.PORT || 3000, process.env.IP || 'localhost',(error)=>{
     if (error)
         console.log("server not found.");
     else 
