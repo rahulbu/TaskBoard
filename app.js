@@ -42,7 +42,7 @@ passport.use(new localStrategy({
     .where({ id : username})
     .whereNull('safe_delete')
     .then(rows=>{
-        console.log(rows[0]);
+        // console.log(rows[0]);
         if(rows[0]){
             if(customFunctions.verifyPassword(password,rows[0].password,rows[0].salt))
                 return done(null,rows[0]);
@@ -65,7 +65,7 @@ passport.deserializeUser((user,done)=>{
     .whereNull('safe_delete')
     .then(rows=>{
         console.log("logging length")
-        console.log(rows[0]);
+        // console.log(rows[0]);
         done(null,rows[0]);
     }).catch(error=>{
         return done(error);
@@ -75,7 +75,7 @@ passport.deserializeUser((user,done)=>{
 
 app.use(function(req,res,next){
     res.locals.user =req.user;
-     console.log("2"+req.user);
+    //  console.log("2"+req.user);
     // res.locals.error = req.flash("error","");
     // res.locals.success = req.flash("success","");
     next();

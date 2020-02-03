@@ -1,5 +1,6 @@
 const router = require('express').Router(),
       middleware = require('./../middleware/index'),
+      customFunctions = require('./../middleware/customFunctions'),
       crypto = require('crypto'),
       knex = require('../db/index');
 
@@ -22,12 +23,25 @@ router.post('/new',middleware.isAdmin,(req,res)=>{
             .insert({
                 id: id, name: name, email: email, phone: phone, role: role, salt: salt, password: password
             }).then(rows=>{
-                res.sendStatus(201);
+                email = "devdummyrahul@gmail.com"
+                customFunctions.sendMailService(email,{password: req.body.password, text: "new user", id:id})
+                    .then(result=>{
+                        // res.statusCode(200);
+                        // res.redirect("back");
+                    // res.sendStatus(201);
+                    console.log("mail sent");
+                    res.redirect('back');
+                    }).catch(err=>{
+                        // res.statusCode(400);
+                        console.log("couldn't send mail");
+                        console.log(err);
+                        res.redirect('back');
+                    })
                 console.log("added user")
             }).catch(error=>{
                 res.sendStatus(400);
                 console.log("user error 1");
-                console.log(error.sqlMessage);
+                console.log(error);
             })
 })
 

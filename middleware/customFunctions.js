@@ -1,4 +1,7 @@
 const crypto = require('crypto');
+const { Worker } = require('worker_threads')
+
+
 var customFunctions = {};
 
 customFunctions.verifyPassword = (enteredPass, storedPass,salt)=>{
@@ -8,6 +11,23 @@ customFunctions.verifyPassword = (enteredPass, storedPass,salt)=>{
     if( storedPass==password)
         return true;
     return false;
+}
+
+function runService(workerData) {
+    return new Promise((resolve, reject) => {
+        const worker = new Worker(__dirname+"/mailWorker.js", { workerData });
+        worker.on('message', resolve);
+        worker.on('error', reject);
+        worker.on('exit', (code) => {
+        if (code !== 0)
+            reject(new Error(`Worker stopped with exit code ${code}`));
+        })
+    });
+}
+
+customFunctions.sendMailService = async function(userMail,message) {
+    const result = await runService({ userEmail : userMail, message: message});
+    console.log(result);
 }
 
 
