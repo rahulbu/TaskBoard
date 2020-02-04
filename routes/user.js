@@ -51,7 +51,7 @@ router.get('/:id',middleware.isLoggedIn,(req,res)=>{
         .where({
             id: req.params.id
         }).then(rows=>{
-            res.send(rows);
+            res.json(rows);
         }).catch(error=>{
             console.log('no such record');
             console.log("user error 2");
