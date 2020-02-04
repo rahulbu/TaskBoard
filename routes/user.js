@@ -25,19 +25,18 @@ router.post('/new',middleware.isAdmin,(req,res)=>{
             }).then(rows=>{
                 email = "devdummyrahul@gmail.com"
                 customFunctions.sendMailService(email,{password: req.body.password, text: "new user", id:id})
-                    .then(result=>{
-                        // res.statusCode(200);
-                        // res.redirect("back");
-                    // res.sendStatus(201);
-                    console.log("mail sent");
-                    res.redirect('back');
-                    }).catch(err=>{
-                        // res.statusCode(400);
-                        console.log("couldn't send mail");
-                        console.log(err);
-                        res.redirect('back');
-                    })
-                console.log("added user")
+            .then(result=>{
+            console.log("mail sent");
+            // res.redirect('back');
+            res.sendStatus(200);
+            })
+                    // .catch(err=>{
+                //         // res.statusCode(400);
+                //         console.log("couldn't send mail");
+                //         console.log(err);
+                //         res.redirect('back');
+                //     })
+                // console.log("added user")
             }).catch(error=>{
                 res.sendStatus(400);
                 console.log("user error 1");
@@ -47,7 +46,7 @@ router.post('/new',middleware.isAdmin,(req,res)=>{
 
 router.get('/:id',middleware.isLoggedIn,(req,res)=>{
     knex('users')
-        // .whereNull('safe_delete')
+        .whereNull('safe_delete')
         .select('id','name','phone','email','role')
         .where({
             id: req.params.id
@@ -95,11 +94,12 @@ router.put('/:id/edit',middleware.isLoggedIn,(req,res)=>{
                     }).then(rows=>{
                         res.statusCode(201)
                         res.send("updated");
-                    }).catch(err=>{
-                        console.log("user error 4");
-                        res.statusCode(401);
-                        res.redirect("back");
                     })
+                    // .catch(err=>{
+                    //     console.log("user error 4");
+                    //     res.statusCode(401);
+                    //     res.redirect("back");
+                    // })
             }
             else{
                 res.statusCode(403)
@@ -108,6 +108,7 @@ router.put('/:id/edit',middleware.isLoggedIn,(req,res)=>{
         }).catch(error=>{
             console.log("error in password");
             console.log("user error 5");
+            res.sendStatus(400);
             res.redirect('/'); 
         })
 
@@ -117,12 +118,13 @@ router.delete('/:id/delete',middleware.isAdmin,(req,res)=>{
     
     knex('users')
         .update({safe_delete: knex.fn.now()})
+        .whereNull('safe_delete')
         .where({id: req.params.id})
         .then(rows=>{
             res.statusCode(200)
             res.redirect('/');
         }).catch(err=>{
-            res.statusCode(401);
+            res.statusCode(400);
             console.log("user error 6");
             res.send("error")
         });

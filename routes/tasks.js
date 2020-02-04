@@ -89,7 +89,8 @@ router.get('/:id/tasks/:task_id',middleware.isLoggedIn,(req,res)=>{
             id : req.params.task_id,
             assignee: req.params.id
         })
-        .orWhere({id : req.params.task_id, report_to: req.params.id}).then(rows=>{
+        .orWhere({id : req.params.task_id, report_to: req.params.id})
+        .then(rows=>{
             res.json(rows);
         }).catch(error=>{
             console.log("tasks error 5");

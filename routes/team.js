@@ -37,10 +37,11 @@ router.post('/:id/team/new',middleware.isAdmin,(req,res)=>{
                 .insert(fieldsToInsert)
                 .then(rows=>{
                     res.sendStatus(201);
-                }).catch(error=>{
-                    console.log("team error 1");
-                    res.sendStatus(401);
                 })
+                // .catch(error=>{
+                //     console.log("team error 1");
+                //     res.sendStatus(401);
+                // })
         }).catch(error=>{
             console.log("team error 2");
             res.sendStatus(401);

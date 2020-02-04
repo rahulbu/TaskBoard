@@ -3,7 +3,7 @@
 
 const config = require('./../.config')
 
-
+/*
 const knex = require('knex')({
     client: 'mysql',
     connection:{
@@ -18,16 +18,16 @@ const knex = require('knex')({
     fetchAsString: ['number','date'],
 });
 
-
+*/
 
     /// production 
-/*
+
 const knex = require('knex')({
     client: 'pg',
     connection: process.env.DATABASE_URL,
     ssl:true,
     pool: { min: 1, max: 7 }
 });
-*/
+
 
 module.exports = knex;

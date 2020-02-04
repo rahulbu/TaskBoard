@@ -1,5 +1,6 @@
 const { workerData, parentPort} = require('worker_threads');
 const nodeMailer = require('nodemailer');
+const config = require('./../.config.js');
 
 console.log("web worker in progress");
 // console.log(workerData);
@@ -11,18 +12,18 @@ async function main() {
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: 'rahulappu.das83@gmail.com', // generated ethereal user
-        pass: 'prarthana7' // generated ethereal password
+        user: config.Mail_address || process.env.MAIL_ADDRESS, // generated ethereal user
+        pass: config.Mail_password || process.env.MAIL_PASSWORD // generated ethereal password
       }
     });
   
     // send mail with defined transport object
     let info = await transporter.sendMail({
-      from: 'rahulapp.das83@gmail.com', // sender address
+      from: config.Mail_address || process.env.MAIL_ADDRESS, // sender address
       to: workerData.userEmail, // list of receivers
       subject: workerData.message.text, // Subject line
-      text: "Hello world?", // plain text body
-      html: "<b>Hello world?</b><p> id : "+ workerData.message.id+"<br>password : "+workerData.message.password+"<br> Regards,<br>Test Team</p>" // html body
+      text: workerData.message.text || "Hello", // plain text body
+      html: "<b>welcome, <br>use the following credentials to login</b><p> id : "+ workerData.message.id+"<br>password : "+workerData.message.password+"<br> Regards,<br>Test Team</p>" // html body
     });
   
     console.log("Message sent: %s", info.messageId);
