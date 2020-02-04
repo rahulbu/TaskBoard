@@ -78,6 +78,9 @@ app.use(function(req,res,next){
     //  console.log("2"+req.user);
     // res.locals.error = req.flash("error","");
     // res.locals.success = req.flash("success","");
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
     next();
 })
 
