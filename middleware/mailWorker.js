@@ -12,14 +12,14 @@ async function main() {
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: config.Mail_address || process.env.MAIL_ADDRESS, // generated ethereal user
-        pass: config.Mail_password || process.env.MAIL_PASSWORD // generated ethereal password
+        user: (config.Mail_address) ? config.Mail_address : process.env.MAIL_ADDRESS, // generated ethereal user
+        pass: (config.Mail_password) ? config.Mail_password : process.env.MAIL_PASSWORD // generated ethereal password
       }
     });
   
     // send mail with defined transport object
     let info = await transporter.sendMail({
-      from: config.Mail_address || process.env.MAIL_ADDRESS, // sender address
+      from: (config.Mail_address) ?  config.Mail_address : process.env.MAIL_ADDRESS, // sender address
       to: workerData.userEmail, // list of receivers
       subject: workerData.message.text, // Subject line
       text: workerData.message.text || "Hello", // plain text body
