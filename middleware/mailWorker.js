@@ -1,6 +1,6 @@
 const { workerData, parentPort} = require('worker_threads');
 const nodeMailer = require('nodemailer');
-const config = require('./../.config.js');
+// const config = require('./../.config.js');
 
 console.log("web worker in progress");
 // console.log(workerData);
