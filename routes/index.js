@@ -8,7 +8,8 @@ router.get('/login',(req,res)=>{
 });
 
 router.post('/login',passport.authenticate('local',{
-    failureRedirect: "/login"
+    // failureRedirect: "/login",
+    
 }),(req,res)=>{
     console.log("user id : "+req.user.id);
     res.redirect("/user/"+req.user.id);
