@@ -5,7 +5,8 @@ middleware.isLoggedIn = function(req,res,next){
     if(req.isAuthenticated())
         return next();
     else {
-        res.redirect("/");
+        // res.redirect("/");
+        res.sendStatus(401);
     }
 }
 
@@ -18,7 +19,7 @@ middleware.isAdmin = (req,res,next)=>{
             
             res.sendStatus(401);
         }
-    }else res.redirect('/');
+    }else res.sendStatus('/');
 }
 
 
