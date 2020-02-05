@@ -44,6 +44,22 @@ router.post('/:id/team/new',middleware.isAdmin,(req,res)=>{
         })
 });
 
+router.get('/:id/team/all',middleware.isLoggedIn,(req,res)=>{
+    knex('team_members')
+        .join('team',{'team_members.team_id':'team.id'})
+        .select('team.name','team.id')
+        .where({
+            'team_members.user_id': req.params.id
+        })
+        .then(rows=>{
+            res.status(200).json(rows)
+        })
+        .catch(err=>{
+            console.log(err);
+            res.sendStatus(404);
+        })
+})
+
 router.get('/:id/team/:team_id',middleware.isLoggedIn,(req,res)=>{
     knex('team_members')
         .join('users',{'users.id':'team_members.user_id'})

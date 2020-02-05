@@ -37,7 +37,6 @@ passport.use(new localStrategy(function(username,password,done){
     .where({ id : username})
     .whereNull('safe_delete')
     .then(rows=>{
-        // console.log(rows[0]);
         if(rows[0]){
             if(customFunctions.verifyPassword(password,rows[0].password,rows[0].salt))
                 return done(null,rows[0]);
@@ -59,8 +58,6 @@ passport.deserializeUser((user,done)=>{
     .select('id','name','role')
     .whereNull('safe_delete')
     .then(rows=>{
-        console.log("logging length")
-        // console.log(rows[0]);
         done(null,rows[0]);
     }).catch(error=>{
         return done(error);
@@ -102,5 +99,5 @@ app.listen(process.env.PORT, process.env.IP,(error)=>{
     if (error)
         console.log("server not found.");
     else 
-    console.log("server is up and running ...");
+        console.log("server is running ...");
 });
