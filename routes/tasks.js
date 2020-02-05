@@ -18,7 +18,7 @@ router.get('/:id/tasks',middleware.isLoggedIn,(req,res)=>{
         })
 });
 
-router.get('/:id/all',middleware.isLoggedIn,(req,res)=>{
+router.get('/:id/tasks/all',middleware.isLoggedIn,(req,res)=>{
     knex('tasks')
         .where({
             assignee: req.params.id
