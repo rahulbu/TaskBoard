@@ -1,6 +1,6 @@
-/*
-    // local setup 
 
+    // local setup 
+/*
 const config = require('./../.config')
 
 
