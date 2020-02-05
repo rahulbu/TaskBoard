@@ -8,10 +8,10 @@ router.get('/:id/team/new',middleware.isAdmin,(req,res)=>{
     knex('users')
         .select('id','name')
         .then(rows=>{
-            res.json(rows);
+            res.status(200).json(rows);
         }).catch(err=>{
             console.log("team error 0");
-            res.sendStatus(400);
+            res.sendStatus(404);
         })
 });
 
@@ -38,17 +38,10 @@ router.post('/:id/team/new',middleware.isAdmin,(req,res)=>{
                 .then(rows=>{
                     res.sendStatus(201);
                 })
-                // .catch(error=>{
-                //     console.log("team error 1");
-                //     res.sendStatus(401);
-                // })
         }).catch(error=>{
             console.log("team error 2");
-            res.sendStatus(401);
+            res.sendStatus(400);
         })
-
-    res.status(201);
-    res.send("creation of new team");
 });
 
 router.get('/:id/team/:team_id',middleware.isLoggedIn,(req,res)=>{
@@ -56,14 +49,14 @@ router.get('/:id/team/:team_id',middleware.isLoggedIn,(req,res)=>{
         .join('users',{'users.id':'team_members.user_id'})
         .join('team',{'team.id':'team_members.team_id'})
         .select('users.name','team.name')
-        // .whereNull('team_members.safe_delete')
+        .whereNull('team_members.safe_delete')
         .where({
             'team_members.team_id' : req.params.team_id
         }).then(rows=>{
-            res.json(rows);
+            res.status(200).json(rows);
         }).catch(err=>{
             console.log("team error 3");
-            res.sendStatus(400);
+            res.sendStatus(404);
         })
 });
 
@@ -71,12 +64,12 @@ router.delete('/:id/team/:team_id/delete',middleware.isAdmin,(req,res)=>{
     knex('tasks')
         .update({ safe_delete: knex.fn.now()})
         .where({ id: req.params.team_id})
+        .whereNull("safe_delete")
         .then(rows=>{
-            res.statusCode(200);
-            res.send("deletion in process");
+            res.sendStatus(204);
         }).catch(error=>{
             console.log("team error 4");
-            res.sendStatus(401);
+            res.sendStatus(400);
         })
 });
 

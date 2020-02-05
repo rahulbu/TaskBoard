@@ -3,16 +3,18 @@ const knex = require('./../db/index');
 var middleware = require('./../middleware/index');
 
 router.get('/:id/tasks',middleware.isLoggedIn,(req,res)=>{
-    console.log(req.user);
+    
     knex('tasks')
         .where({
             assignee: req.params.id
-        }).then(rows=>{
-            res.json(rows);
-        }).catch(error=>{
+        })
+        .then(rows=>{
+            res.status(200).json(rows);
+        })
+        .catch(error=>{
             console.log("tasks error 1");
-            res.statusCode(400);
-            res.redirect("back");
+            res.sendStatus(404);
+            // res.redirect("back");
         })
 });
 
@@ -20,14 +22,16 @@ router.get('/:id/alltasks',middleware.isLoggedIn,(req,res)=>{
     knex('tasks')
         .where({
             assignee: req.params.id
-        }).orWhere({
+        })
+        .orWhere({
             report_to: req.params.id
-        }).then(rows=>{
-            res.json(rows);
-        }).catch(error=>{
+        })
+        .then(rows=>{
+            res.status(200).json(rows);
+        })
+        .catch(error=>{
             console.log("tasks error 2");
-            res.statusCode(400)
-            res.redirect("back");
+            res.sendStatus(404)
         })
 })
 
@@ -40,11 +44,11 @@ router.post('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{
     let name = req.body.name,
         priority = req.body.priority,
         description = req.body.description,
-        progress = req.body.progress,
+        progress = "to do",
         dueDate = req.body.dueDate,
         assignee = req.body.assignee,
         reportTo = req.params.id;
-        progressRecordedOn = knex.fn.now();
+        // progressRecordedOn = knex.fn.now();
         knex('tasks')
             .insert({
                 name: name,
@@ -53,32 +57,31 @@ router.post('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{
                 progress: progress,
                 due_date: dueDate,
                 assignee: assignee,
-                report_to: reportTo,
-                progress_recorded_on: progress_recorded_on
+                report_to: reportTo
+                // progress_recorded_on: progressRecordedOn
             }).then(res=>{
-                console.log(res);
-                res.statusCode(201);
-                res.redirect("/user/"+req.params.id+"/tasks");
+                res.sendStatus(201);
+                // res.redirect("/user/"+req.params.id+"/tasks");
             }).catch(error=>{
                 console.log("tasks error 3");
-                res.statusCode(400);
-                res.redirect("back");
+                res.sendStatus(400);
             })
 });
 
-router.get('/:id/tasks/team/:teamId',middleware.isLoggedIn,(req,res)=>{
+router.get('/:id/tasks/team/:teamId',middleware.isLoggedIn,(req,res)=>{   ////////////////query not proper
     knex('team_members')
-        .join('tasks',{'team_members.user_id':'tasks.assignee'})
+        .where({
+            "team_members.team_id": req.params.teamId
+        })
         .join('users',{'users.id':'team_members.user_id'})
+        .join('tasks',{'team_members.user_id':'tasks.assignee'})
         .select('users.name','tasks.name','tasks.description','tasks.progress')
         .whereIn('report_to', knex.select('user_id').from('team_members').where({team_id: req.params.teamId}))
-        .where({
-            team_id: req.params.teamId
-        }).then(rows=>{
-            res.json(rows);
+        .then(rows=>{
+            res.status(200).json(rows);
         }).catch(error=>{
             console.log("tasks error 4");
-            res.redirect('back');
+            res.sendStatus(404);
         })
 });
 
@@ -91,11 +94,11 @@ router.get('/:id/tasks/:task_id',middleware.isLoggedIn,(req,res)=>{
         })
         .orWhere({id : req.params.task_id, report_to: req.params.id})
         .then(rows=>{
-            res.json(rows);
+            res.status(200).json(rows);
         }).catch(error=>{
             console.log("tasks error 5");
-            res.statusCode(401);
-            res.redirect("back");
+            res.sendStatus(401);
+            // res.redirect("back");
         });
 });
 
@@ -104,11 +107,11 @@ router.get('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{
     knex('tasks')
         .where({id: req.params.task_id})
         .then(rows=>{
-            res.json(rows);
+            res.status(200).json(rows);
         }).catch(error=>{
             console.log("tasks error 6");
-            res.sendStatus(401);
-            res.redirect("back");
+            res.sendStatus(404);
+            // res.redirect("back");
         })
 })
 
@@ -124,10 +127,10 @@ router.put('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{
         })
         .where({id: req.params.task_id})
         .then(rows=>{
-            res.sendStatus(202);
+            res.sendStatus(204);
         }).catch(error=>{
             console.log("tasks error 7");
-            res.sendStatus(401);
+            res.sendStatus(400);
         })
 });
 

@@ -4,12 +4,12 @@ const router = require('express').Router(),
       crypto = require('crypto'),
       knex = require('../db/index');
 
-router.get('/new',middleware.isAdmin,(req,res)=>{
-
-    res.redirect("/userNew");
+router.get('/:id/new',middleware.isAdmin,(req,res)=>{
+    
+    res.redirect("/"+req.params.id+"/userNew");
 })
 
-router.post('/new',middleware.isAdmin,(req,res)=>{
+router.post('/:id/new',middleware.isAdmin,(req,res)=>{
 
     let id = req.body.id,
         name = req.body.name,
@@ -23,20 +23,13 @@ router.post('/new',middleware.isAdmin,(req,res)=>{
             .insert({
                 id: id, name: name, email: email, phone: phone, role: role, salt: salt, password: password
             }).then(rows=>{
-                email = "devdummyrahul@gmail.com"
-                customFunctions.sendMailService(email,{password: req.body.password, text: "new user", id:id})
-            .then(result=>{
-            console.log("mail sent");
+            //     email = "devdummyrahul@gmail.com"
+            //     customFunctions.sendMailService(email,{password: req.body.password, text: "new user", id:id})
+            // .then(result=>{
+            // console.log("mail sent");
             // res.redirect('back');
-            res.sendStatus(200);
-            })
-                    // .catch(err=>{
-                //         // res.statusCode(400);
-                //         console.log("couldn't send mail");
-                //         console.log(err);
-                //         res.redirect('back');
-                //     })
-                // console.log("added user")
+            res.sendStatus(201);
+
             }).catch(error=>{
                 res.sendStatus(400);
                 console.log("user error 1");
@@ -51,29 +44,28 @@ router.get('/:id',middleware.isLoggedIn,(req,res)=>{
         .where({
             id: req.params.id
         }).then(rows=>{
-            res.json(rows);
+            res.status(200).json(rows);
         }).catch(error=>{
             console.log('no such record');
             console.log("user error 2");
-            res.sendStatus(400);
+            console.log(error);
+            res.sendStatus(404);
         });
 });
 
 router.get('/:id/edit',middleware.isLoggedIn,(req,res)=>{
     
-    /// edit parameters
-
 
     knex('user')
     .select('id','name','phone','email')
     .where({
         id: req.params.id
     }).then(rows=>{
-        res.send(rows);
+        res.status(200).json(rows);
     }).catch(error=>{
         console.log('no such record');
         console.log("user error 3");
-        res.sendStatus(400);
+        res.sendStatus(404);
     });
 
 });
@@ -92,24 +84,16 @@ router.put('/:id/edit',middleware.isLoggedIn,(req,res)=>{
                     .update({
                         password: crypto.pbkdf2Sync(newPassword,salt,100,128,'sha512').toString('hex')
                     }).then(rows=>{
-                        res.statusCode(201)
-                        res.send("updated");
+                        res.sendStatus(204);
                     })
-                    // .catch(err=>{
-                    //     console.log("user error 4");
-                    //     res.statusCode(401);
-                    //     res.redirect("back");
-                    // })
             }
             else{
-                res.statusCode(403)
-                res.redirect('back');
+                res.sendstatus(400);
             }
         }).catch(error=>{
             console.log("error in password");
             console.log("user error 5");
             res.sendStatus(400);
-            res.redirect('/'); 
         })
 
 });
@@ -121,12 +105,10 @@ router.delete('/:id/delete',middleware.isAdmin,(req,res)=>{
         .whereNull('safe_delete')
         .where({id: req.params.id})
         .then(rows=>{
-            res.statusCode(200)
-            res.redirect('/');
+            res.sendStatus(204)
         }).catch(err=>{
-            res.statusCode(400);
+            res.sendStatus(400);
             console.log("user error 6");
-            res.send("error")
         });
 });
 

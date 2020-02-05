@@ -1,6 +1,6 @@
-
-    // local setup 
 /*
+    // local setup 
+
 const config = require('./../.config')
 
 
@@ -13,12 +13,12 @@ const knex = require('knex')({
         database: config.Database_database
     },
     pool: {
-        min: 0, max:7
+        min: 1, max:10
     },
     fetchAsString: ['number','date'],
 });
 
-*/
+/* */
 
     /// production 
 
@@ -26,8 +26,8 @@ const knex = require('knex')({
     client: 'pg',
     connection: process.env.DATABASE_URL,
     ssl:true,
-    pool: { min: 1, max: 7 }
+    pool: { min: 1, max: 10 }
 });
-
+/**/
 
 module.exports = knex;

@@ -19,7 +19,7 @@ const tasksRoutes = require('./routes/tasks'),
         userRoutes = require('./routes/user'),
        teamRoutes = require('./routes/team');
 
-
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
 // app.use(express.static('./'))
 app.use(expressSanitizer());
@@ -31,12 +31,7 @@ app.use(expressSession({
     saveUninitialized: false,
 }))
 
-app.use(passport.initialize());
-app.use(passport.session());
-passport.use(new localStrategy({
-    usernameField : 'id',
-    passwordField : 'password',
-},function(username,password,done){
+passport.use(new localStrategy(function(username,password,done){
     knex('users')
     .select('id','password','role','salt')
     .where({ id : username})
@@ -72,10 +67,11 @@ passport.deserializeUser((user,done)=>{
     })
 })
 
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(function(req,res,next){
     res.locals.user =req.user;
-    //  console.log("2"+req.user);
     // res.locals.error = req.flash("error","");
     // res.locals.success = req.flash("success","");
     res.header("Access-Control-Allow-Origin", "*");
@@ -93,8 +89,7 @@ app.use('/user',teamRoutes);
 app.get('/',(req,res)=>{
     res.sendFile(__dirname+"/login.html")
 })
-app.get('/userNew',(req,res)=>{
-    console.log(req.user);
+app.get('/:id/userNew',(req,res)=>{
     res.sendFile(__dirname+"/newUser.html")
 })
 
@@ -102,7 +97,8 @@ app.get('*',(req,res)=>{
     res.redirect("/");
 });
 
-app.listen(process.env.PORT , process.env.IP,(error)=>{
+app.listen(process.env.PORT || 3000 , process.env.IP|| "127.0.0.1",(error)=>{
+    console.log(process.env.PORT);
     if (error)
         console.log("server not found.");
     else 

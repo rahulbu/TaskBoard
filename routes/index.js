@@ -7,13 +7,10 @@ router.get('/login',(req,res)=>{
     res.redirect("/");
 });
 
-router.post('/login',passport.authenticate('local',{
-    // failureRedirect: "/login",
-    
-}),(req,res)=>{
+router.post('/login',passport.authenticate('local'),(req,res)=>{
     console.log("user id : "+req.user.id);
-    // res.redirect("/user/"+req.user.id);
-    res.sendStatus(200);
+    res.redirect("/user/"+req.user.id);
+    // res.sendStatus(200);
 });
 
 router.get('/logout',middleware.isLoggedIn,(req,res)=>{
