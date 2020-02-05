@@ -33,6 +33,16 @@ customFunctions.sendMailService = async function(userMail,message) {
     console.log(result);
 }
 
+// const sgMail = require('@sendgrid/mail');
+// sgMail.setApiKey('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');
+// const msg = {
+//   to: 'rahulappu.das83@gmail.com',
+//   from: 'admin@TaskLine.com',
+//   subject: "new user invite mail",
+//   text: 'and easy to do anywhere, even with Node.js',
+//   html: '<b> login to your task line account using following credentials </b>',
+// };
+// sgMail.send(msg);
 
 
 module.exports = customFunctions;

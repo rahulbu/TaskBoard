@@ -4,6 +4,20 @@ const router = require('express').Router(),
       crypto = require('crypto'),
       knex = require('../db/index');
 
+
+      const sgMail = require('@sendgrid/mail');
+      sgMail.setApiKey('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');
+    //   const msg = {
+    //     to: 'rahulappu.das83@gmail.com',
+    //     from: 'admin@TaskLine.com',
+    //     subject: "new user invite mail",
+    //     text: 'and easy to do anywhere, even with Node.js',
+    //     html: '<b> login to your task line account using following credentials </b>',
+    //   };
+    //   sgMail.send(msg);
+
+
+
 router.get('/:id/new',middleware.isAdmin,(req,res)=>{
     
     res.redirect("/"+req.params.id+"/userNew");
@@ -17,7 +31,8 @@ router.post('/:id/new',middleware.isAdmin,(req,res)=>{
         phone = req.body.phone,
         role = req.body.role,
         salt = crypto.randomBytes(4).toString('hex'),
-        password = crypto.pbkdf2Sync(req.body.password,salt,100,128,'sha512').toString('hex');
+        pass = req.body.password,
+        password = crypto.pbkdf2Sync(pass,salt,100,128,'sha512').toString('hex');
 
         knex('users')
             .insert({
@@ -28,6 +43,13 @@ router.post('/:id/new',middleware.isAdmin,(req,res)=>{
             // .then(result=>{
             // console.log("mail sent");
             // res.redirect('back');
+            sgMail.send({
+                to: email,
+                from: 'admin@TaskLine.com',
+                subject: "new user invite mail",
+                text: 'and easy to do anywhere, even with Node.js',
+                html: '<b> login to your task line account using following credentials </b>'+'<i> user id:'+id+'<br>password:'+pass+'</i>'
+            })
             res.sendStatus(201);
 
             }).catch(error=>{
