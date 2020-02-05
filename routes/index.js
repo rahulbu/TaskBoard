@@ -13,7 +13,7 @@ router.post('/login',passport.authenticate('local'),(req,res)=>{
     // res.sendStatus(200);
 });
 
-router.get('/logout',middleware.isLoggedIn,(req,res)=>{
+router.get('/logout',(req,res)=>{
     req.logOut();
     console.log('logged out');
     res.redirect('/');
