@@ -72,8 +72,8 @@ app.use(function(req,res,next){
     res.locals.user =req.user;
     // res.locals.error = req.flash("error","");
     // res.locals.success = req.flash("success","");
-    // res.header("Access-Control-Allow-Origin", "*");
-    // res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     // res.header("Access-Control-Allow-Credentials","true")
 
     // res.header('Access-Control-Allow-Origin', 'http://localhost:8000/');
@@ -102,7 +102,7 @@ app.get('*',(req,res)=>{
     res.redirect("/");
 });
 
-app.listen(3000 || process.env.PORT ,'127.0.0.1' || process.env.IP,(error)=>{
+app.listen(process.env.PORT ,process.env.IP,(error)=>{
     console.log(process.env.PORT);
     if (error)
         console.log("server not found.");

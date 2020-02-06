@@ -1,8 +1,8 @@
 const redis =  require('redis');
 
-const redisClient = redis.createClient();
+// const redisClient = redis.createClient();
 
-// const redisClient = redis.createClient(process.env.REDIS);
+const redisClient = redis.createClient(process.env.REDIS_URL);    // production
 
 redisClient.on("connect",(err)=>{
     if(err)
