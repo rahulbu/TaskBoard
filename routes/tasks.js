@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const knex = require('./../db/index');
 var middleware = require('./../middleware/index');
+const mailWorker = require('./../middleware/mailWorker');
 
 router.get('/:id/tasks',middleware.isLoggedIn,(req,res)=>{
     
@@ -8,13 +9,14 @@ router.get('/:id/tasks',middleware.isLoggedIn,(req,res)=>{
         .where({
             assignee: req.params.id
         })
+        .whereNull('safe_delete')
+        .select('name','priority','description','progress','progress_recorded_on','due_date','assignee','report_to')
         .then(rows=>{
             res.status(200).json(rows);
         })
         .catch(error=>{
             console.log("tasks error 1");
             res.sendStatus(404);
-            // res.redirect("back");
         })
 });
 
@@ -26,6 +28,7 @@ router.get('/:id/tasks/all',middleware.isLoggedIn,(req,res)=>{
         .orWhere({
             report_to: req.params.id
         })
+        .whereNull('safe_delete')
         .then(rows=>{
             res.status(200).json(rows);
         })
@@ -48,7 +51,7 @@ router.post('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{
         dueDate = req.body.dueDate,
         assignee = req.body.assignee,
         reportTo = req.params.id;
-        // progressRecordedOn = knex.fn.now();
+        progressRecordedOn = knex.fn.now();
         knex('tasks')
             .insert({
                 name: name,
@@ -57,13 +60,25 @@ router.post('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{
                 progress: progress,
                 due_date: dueDate,
                 assignee: assignee,
-                report_to: reportTo
-                // progress_recorded_on: progressRecordedOn
-            }).then(res=>{
+                report_to: reportTo,
+                progress_recorded_on: progressRecordedOn
+            }).then(rows=>{
                 res.sendStatus(201);
-                // res.redirect("/user/"+req.params.id+"/tasks");
+            })
+            .then(()=>{
+                knex('users')
+                    .select('email')
+                    .where({id: assignee})
+                    .then(rows=>{
+                        if(rows.length>0)
+                            mailWorker.mailQueue.add({
+                                userMailId: rows[0].email,
+                                subject: "Task notification"
+                            })
+                    })
             }).catch(error=>{
                 console.log("tasks error 3");
+                console.log(error)
                 res.sendStatus(400);
             })
 });
@@ -93,12 +108,12 @@ router.get('/:id/tasks/:task_id',middleware.isLoggedIn,(req,res)=>{
             assignee: req.params.id
         })
         .orWhere({id : req.params.task_id, report_to: req.params.id})
+        .whereNull('safe_delete')
         .then(rows=>{
             res.status(200).json(rows);
         }).catch(error=>{
             console.log("tasks error 5");
-            res.sendStatus(401);
-            // res.redirect("back");
+            res.sendStatus(404);
         });
 });
 
@@ -106,12 +121,12 @@ router.get('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{
     
     knex('tasks')
         .where({id: req.params.task_id})
+        .whereNull('safe_delete')
         .then(rows=>{
             res.status(200).json(rows);
         }).catch(error=>{
             console.log("tasks error 6");
             res.sendStatus(404);
-            // res.redirect("back");
         })
 })
 
@@ -126,6 +141,7 @@ router.put('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{
             progress_recorded_on: progressRecordedOn
         })
         .where({id: req.params.task_id})
+        .whereNull('safe_delete')
         .then(rows=>{
             res.sendStatus(204);
         }).catch(error=>{

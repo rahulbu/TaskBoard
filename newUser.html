@@ -5,7 +5,7 @@
         </title>
     </head>
     <body>
-        <form action="/user/new" method="POST">
+        <form action="/user/admin/new" method="POST">
             <input type='text' name="id" placeholder="user/employee id" maxlength=5  required/>
             <input type="text" name="name" placeholder="name" maxlength=30 required />
             <input type="email" name="email" placeholder="email" maxlength=50 required />
@@ -14,7 +14,7 @@
                 <option value="user">generl user</option>
                 <option value="admin">admin</option>
             </select>
-            <input type="password" name="password" placeholder="password" required />
+            <input type="text" name="designation" placeholder="designation" required />
             <button type="submit">submit</button>
         </form>
     </body>

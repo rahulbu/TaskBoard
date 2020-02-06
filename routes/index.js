@@ -1,6 +1,5 @@
 const router = require('express').Router(),
       passport = require('passport');
-    //   middleware = require('./../middleware/index');
 const redisClient = require('./../db/redis');
 const jws = require('jws');
 

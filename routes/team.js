@@ -4,9 +4,13 @@ const middleware = require('./../middleware/index');
 
 
 router.get('/:id/team/new',middleware.isAdmin,(req,res)=>{
-    res.send("new team creation page");
+    // res.send("new team creation page");
+    
+    
+    
     knex('users')
         .select('id','name')
+        .whereNull('safe_delete')
         .then(rows=>{
             res.status(200).json(rows);
         }).catch(err=>{
@@ -27,7 +31,7 @@ router.post('/:id/team/new',middleware.isAdmin,(req,res)=>{
             description: description,
             created_on: created_on
         })
-        .returning('id')
+        // .returning('id')
         .then(row_id=>{
             
             let fieldsToInsert = req.body.users.map(field => 
@@ -51,6 +55,7 @@ router.get('/:id/team/all',middleware.isLoggedIn,(req,res)=>{
         .where({
             'team_members.user_id': req.params.id
         })
+        .whereNull('safe_delete')
         .then(rows=>{
             res.status(200).json(rows)
         })

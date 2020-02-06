@@ -1,5 +1,6 @@
 var middleware = {};
 const redisClient = require('./../db/redis');
+// const config = require('./../.config');
 const jws = require('jws');
 
 middleware.isLoggedIn = function(req,res,next){
@@ -9,7 +10,7 @@ middleware.isLoggedIn = function(req,res,next){
     if(req.isAuthenticated() && req.params.id==req.user.id){
         return next();
     }
-    else if( key && jws.verify(key,"HS256","secret key")){
+    else if( key && jws.verify(key,"HS256", process.env.SECRET_KEY  /*config.Secret_key*/)){
         redisClient.get(req.params.id,(err,reply)=>{
             if(err)
                 res.sendStatus(500);
@@ -42,7 +43,7 @@ middleware.isAdmin = (req,res,next)=>{
     if(req.isAuthenticated() && req.params.id==req.user.id && req.user.role=="admin"){
         return next();
     }
-    else if( key && jws.verify(key,"HS256","secret key")){
+    else if( key && jws.verify(key,"HS256", process.env.SECRET_KEY/* config.Secret_key*/)){
         redisClient.get(req.params.id,(err,reply)=>{
             if(err)
                 res.sendStatus(500);

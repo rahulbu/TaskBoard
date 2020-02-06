@@ -1,39 +1,58 @@
-const { workerData, parentPort} = require('worker_threads');
-const nodeMailer = require('nodemailer');
+
 // const config = require('./../.config.js');
 
-console.log("web worker in progress");
-// console.log(workerData);
+const Verifier = require("email-verifier");
 
-async function main() {
+const sgMail = require('@sendgrid/mail');
+      
+sgMail.setApiKey(process.env.MAIL_API/* config.Mail_API_key */);
 
-    let transporter = nodeMailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        // user: config.Mail_address,
-        user: process.env.MAIL_ADDRESS, // production
-        // pass: config.Mail_password 
-        pass: process.env.MAIL_PASSWORD // production
-      }
-    });
-  
-    // send mail with defined transport object
-    let info = await transporter.sendMail({
-      // from: config.Mail_address,
-      from: process.env.MAIL_ADDRESS, // sender address production
-      to: workerData.userEmail, // list of receivers
-      subject: workerData.message.text, // Subject line
-      text: workerData.message.text || "Hello", // plain text body
-      html: "<b>welcome, <br>use the following credentials to login</b><p> id : "+ workerData.message.id+"<br>password : "+workerData.message.password+"<br> Regards,<br>Test Team</p>" // html body
-    });
-  
-    console.log("Message sent: %s", info.messageId);
-    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-  }
-  
-  main().then(info=>{
-      console.log(info);
-        parentPort.postMessage({userEmail : workerData, status : 'done'});
-  }).catch(console.error);
+var Queue = require('bull');
+
+// const mailQueue = new Queue('mail_queue','redis://127.0.0.1:6379');
+
+const mailQueue = new Queue('mail_queue',process.env.REDIS_URL);    ////PRODUCTION
+
+mailQueue.on('completed',(job,result)=>{
+     console.log('mail sent')
+    //  console.log(job.data.userMailId);
+})
+
+mailQueue.process(async (job)=>{
+       await sendMail(job.data);
+ })
+
+
+sendMail = (data)=>{
+
+    let html;
+    if(data.subject == "user invitation"){
+      html = "<h1>Welcome,<h1><br><h3>Log in to your task-line account using following credentials</h3><br><a href='http://task-line.herokuapp.com/'>website link</a><br><strong>username : "+data.username+"<br>password : "+data.password+"</strong><br><br><h3>Regards<br>Team TaskLine</h3>";
+    }
+    else {
+      html = "<h2>You have been assigned a task.<br>Priority :<strong>"+data.priority+"</strong><br><br><h3>Regards,<br>Team TaskLine</h3>"
+    }
+    const msg = {
+        to: data.userMailId,
+        from: 'admin@TaskLine.com',
+        subject: data.subject,
+        text: 'log into your TaskLine account for further details.',
+        html: html,
+    };
+    sgMail.send(msg)
+}
+
+
+
+const verifier = new Verifier( process.env.EMAIL_VERIFIER/* config.Email_verifier_key */,{
+    checkCatchAll: false,
+    checkDisposable: false,
+    checkFree: false,
+    validateDNS: true,
+    validateSMTP: true
+});
+
+module.exports = {
+  verifier,
+  mailQueue
+}

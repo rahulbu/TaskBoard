@@ -1,22 +1,9 @@
 const router = require('express').Router(),
       middleware = require('./../middleware/index'),
-      customFunctions = require('./../middleware/customFunctions'),
+    //   customFunctions = require('./../middleware/customFunctions'),
+      mailWorker = require('./../middleware/mailWorker'),
       crypto = require('crypto'),
       knex = require('../db/index');
-
-
-      const sgMail = require('@sendgrid/mail');
-      sgMail.setApiKey('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');
-    //   const msg = {
-    //     to: 'rahulappu.das83@gmail.com',
-    //     from: 'admin@TaskLine.com',
-    //     subject: "new user invite mail",
-    //     text: 'and easy to do anywhere, even with Node.js',
-    //     html: '<b> login to your task line account using following credentials </b>',
-    //   };
-    //   sgMail.send(msg);
-
-
 
 router.get('/:id/new',middleware.isAdmin,(req,res)=>{
     
@@ -25,44 +12,62 @@ router.get('/:id/new',middleware.isAdmin,(req,res)=>{
 
 router.post('/:id/new',middleware.isAdmin,(req,res)=>{
 
-    let id = req.body.id,
+    let email = req.body.email;
+    
+     mailWorker.verifier.verify(email,(err,data)=>{
+        if(err){
+            res.status(400).json({
+                message: "unable to verify email address. Try again"
+            })
+        }
+        else if(data.formatCheck && data.smtpCheck && data.dnsCheck){
+            console.log("valid");
+
+            let id = req.body.id,
         name = req.body.name,
-        email = req.body.email,
         phone = req.body.phone,
+        designation = req.body.designation,
         role = req.body.role,
         salt = crypto.randomBytes(4).toString('hex'),
-        pass = req.body.password,
+        pass = crypto.randomBytes(4).toString('hex'),
         password = crypto.pbkdf2Sync(pass,salt,100,128,'sha512').toString('hex');
 
         knex('users')
             .insert({
-                id: id, name: name, email: email, phone: phone, role: role, salt: salt, password: password
+                id: id, name: name, email: email, phone: phone, role: role, salt: salt, password: password,designation:designation
             }).then(rows=>{
-            //     email = "devdummyrahul@gmail.com"
-            //     customFunctions.sendMailService(email,{password: req.body.password, text: "new user", id:id})
-            // .then(result=>{
-            // console.log("mail sent");
-            // res.redirect('back');
-            sgMail.send({
-                to: email,
-                from: 'admin@TaskLine.com',
-                subject: "new user invite mail",
-                text: 'and easy to do anywhere, even with Node.js',
-                html: '<b> login to your task line account using following credentials </b>'+'<i> user id:'+id+'<br>password:'+pass+'</i>'
-            })
-            res.sendStatus(201);
+            mailWorker.mailQueue.add({
+                userMailId: email,
+                subject: "user invitation",
+                username: id,
+                password: pass
+            });
+
+            res.status(201).json({
+                message: "invite mail sent"
+            });
 
             }).catch(error=>{
-                res.sendStatus(400);
+                
                 console.log("user error 1");
                 console.log(error);
+                res.status(400).json({
+                    message: "couldn't create user. duplicate user id or invalid credentials."
+                })
             })
+
+        }else{
+            res.status(400).json({
+                message: "invalid email address"
+            })
+        }
+    })
 })
 
 router.get('/:id',middleware.isLoggedIn,(req,res)=>{
     knex('users')
         .whereNull('safe_delete')
-        .select('id','name','phone','email','role')
+        .select('id','name','phone','email','role','designation')
         .where({
             id: req.params.id
         }).then(rows=>{
@@ -79,7 +84,8 @@ router.get('/:id/edit',middleware.isLoggedIn,(req,res)=>{
     
 
     knex('user')
-    .select('id','name','phone','email')
+    .select('name','phone','email','designation')
+    .whereNull('safe_delete')
     .where({
         id: req.params.id
     }).then(rows=>{
@@ -89,18 +95,38 @@ router.get('/:id/edit',middleware.isLoggedIn,(req,res)=>{
         console.log("user error 3");
         res.sendStatus(404);
     });
-
 });
 
 router.put('/:id/edit',middleware.isLoggedIn,(req,res)=>{
+
+    let id = req.params.id,
+        { name,phone,email,designation} = req.body;
+
+        knew('users')
+            .where({id: id})
+            .whereNull('safe_delete')
+            .update({
+                name: name, phone: phone, email: email, designation: designation
+            })
+            .then(rows=>{
+                res.sendStatus(204)
+            })
+            .catch(err=>{
+                res.sendStatus(400)
+            })
+})
+
+router.put('/:id/changePassword',middleware.isLoggedIn,(req,res)=>{
     
     let oldPassword = req.body.oldPassword,
         newPassword = req.body.newPassword;
+        
     knex('users')
         .where({id: req.params.id})
+        .whereNull('safe_delete')
         .select('salt','password')
         .then(rows=>{
-            if(rows.password == crypto.pbkdf2Sync(oldPassword,rows.salt,100,128,'sha512').toString('hex')){
+            if(rows[0].password == crypto.pbkdf2Sync(oldPassword,rows.salt,100,128,'sha512').toString('hex')){
                 knex('users')
                     .where({ id: req.params.id})
                     .update({
