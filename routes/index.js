@@ -1,6 +1,8 @@
 const router = require('express').Router(),
-      passport = require('passport'),
-      middleware = require('./../middleware/index');
+      passport = require('passport');
+    //   middleware = require('./../middleware/index');
+const redisClient = require('./../db/redis');
+const jws = require('jws');
 
 
 router.get('/login',(req,res)=>{
@@ -8,17 +10,39 @@ router.get('/login',(req,res)=>{
 });
 
 router.post('/login',passport.authenticate('local'),(req,res)=>{
-    console.log("user id : "+req.user.id);
-    // res.redirect("/user/"+req.user.id);
-    res.sendStatus(200);
+    
+    let payload = {
+        id: req.user.id,
+        name: req.user.name,
+        role: req.user.role
+    }
+    const token = jws.sign({
+        header: { alg: 'HS256'},
+        payload: payload,
+        secret: "secret key"
+    })
+    redisClient.setex(req.user.id,60*60,token,(err,rep)=>{
+        if(err)
+            console.log(err)
+        else 
+            console.log("pushed to redis");
+    })
+    res.status(200).json({
+        id: req.user.id,
+        token: token
+    })
 });
 
-router.get('/logout',(req,res)=>{
+router.get('/user/:id/logout',(req,res)=>{
     req.logOut();
+    redisClient.del(req.params.id,(err,reply)=>{
+        console.log(reply)
+    })
     console.log('logged out');
-    res.redirect('/');
+    res.status(200).json({
+        message: "logout"
+    })
 });
-
 
 
 module.exports = router;

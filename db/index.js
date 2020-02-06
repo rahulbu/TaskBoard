@@ -1,6 +1,6 @@
 
     // local setup 
-/*
+/* */
 const config = require('./../.config')
 
 
@@ -18,7 +18,7 @@ const knex = require('knex')({
     fetchAsString: ['number','date'],
 });
 
-/* */
+/* 
 
     /// production 
 

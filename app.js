@@ -8,13 +8,13 @@ const express = require('express'),
     methodOverride = require('method-override'),
     knex = require('./db/index'),
     customFunctions = require('./middleware/customFunctions'),
-    cors = require('cors'),
+    // cors = require('cors'),
     app = express();
 
 
 
 app.use(helmet())
-app.use(cors())
+// app.use(cors())
 const tasksRoutes = require('./routes/tasks'),
         indexRoutes = require('./routes/index'),
         userRoutes = require('./routes/user'),
@@ -34,7 +34,7 @@ app.use(expressSession({
 
 passport.use(new localStrategy(function(username,password,done){
     knex('users')
-    .select('id','password','role','salt')
+    .select('id','password','role','salt','name')
     .where({ id : username})
     .whereNull('safe_delete')
     .then(rows=>{
@@ -102,7 +102,7 @@ app.get('*',(req,res)=>{
     res.redirect("/");
 });
 
-app.listen(process.env.PORT, process.env.IP,(error)=>{
+app.listen(3000 || process.env.PORT ,'127.0.0.1' || process.env.IP,(error)=>{
     console.log(process.env.PORT);
     if (error)
         console.log("server not found.");
