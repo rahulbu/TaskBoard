@@ -95,15 +95,6 @@ app.get('/:id/userNew',(req,res)=>{
     res.sendFile(__dirname+"/newUser.html")
 })
 
-app.get('/debug-sentry', function mainHandler(req, res) {
-    try{
-    throw new Error('My first Sentry error!');
-    }catch(err){
-        Sentry.captureException(err)
-    }
-});
-
-
 app.get('*',(req,res)=>{
     res.redirect("/");
 });
