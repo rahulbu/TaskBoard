@@ -9,10 +9,15 @@ const express = require('express'),
     knex = require('./db/index'),
     customFunctions = require('./middleware/customFunctions'),
     app = express();
+    
+const Sentry = require('@sentry/node');
 
-
+Sentry.init({ dsn: 'https://131fd8c483c846b4903c4df51ab7771d@sentry.io/2327658' });
 
 app.use(helmet())
+
+// The request handler must be the first middleware on the app
+app.use(Sentry.Handlers.requestHandler());
 
 const tasksRoutes = require('./routes/tasks'),
         indexRoutes = require('./routes/index'),
@@ -93,6 +98,21 @@ app.get('/:id/userNew',(req,res)=>{
 app.get('*',(req,res)=>{
     res.redirect("/");
 });
+
+app.get('/debug-sentry', function mainHandler(req, res) {
+    throw new Error('My first Sentry error!');
+  });
+
+app.use(Sentry.Handlers.errorHandler({
+    shouldHandleError(error) {
+      // Capture all 404 and 500 errors
+      if (error.status === 404 || error.status === 500 || error.status === 401 || error.status === 400) {
+        return true
+      }
+      return false
+    }
+  }));
+
 
 app.listen( process.env.PORT , process.env.IP,(error)=>{
     console.log(process.env.PORT);
