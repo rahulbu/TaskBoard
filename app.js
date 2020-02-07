@@ -96,8 +96,12 @@ app.get('/:id/userNew',(req,res)=>{
 })
 
 app.get('/debug-sentry', function mainHandler(req, res) {
+    try{
     throw new Error('My first Sentry error!');
-  });
+    }catch(err){
+        Sentry.captureException(err)
+    }
+});
 
 
 app.get('*',(req,res)=>{
