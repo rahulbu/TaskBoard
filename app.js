@@ -95,13 +95,15 @@ app.get('/:id/userNew',(req,res)=>{
     res.sendFile(__dirname+"/newUser.html")
 })
 
+app.get('/debug-sentry', function mainHandler(req, res) {
+    throw new Error('My first Sentry error!');
+  });
+
+
 app.get('*',(req,res)=>{
     res.redirect("/");
 });
 
-app.get('/debug-sentry', function mainHandler(req, res) {
-    throw new Error('My first Sentry error!');
-  });
 
 app.use(Sentry.Handlers.errorHandler({
     shouldHandleError(error) {
