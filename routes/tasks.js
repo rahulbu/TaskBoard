@@ -48,6 +48,7 @@ router.get('/:id/tasks/all',middleware.isLoggedIn,(req,res)=>{      /** get all 
         })
         .catch(error=>{
             console.log("tasks error 2");
+            console.log(error)
             Sentry.captureException(error)
             res.sendStatus(404)
         })
