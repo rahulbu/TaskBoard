@@ -19,6 +19,8 @@ router.post('/:id/new',middleware.isAdmin,(req,res)=>{      /** post-method new 
     
      mailWorker.verifier.verify(email,(err,data)=>{
         if(err){
+            Sentry.captureException(err)
+            console.log(err)
             res.status(400).json({
                 message: "unable to verify email address. Try again"
             })
