@@ -1,6 +1,7 @@
 const knex = require('./../db/index');
 const router= require('express').Router();
 const middleware = require('./../middleware/index');
+const customFunctions = require('./../middleware/customFunctions');
 
 const Sentry = require('@sentry/node');
 
@@ -13,6 +14,7 @@ router.get('/:id/team/new',middleware.isAdmin,(req,res)=>{     /* get new team f
     knex('users')
         .select('id','name')
         .whereNull('safe_delete')
+        .orderBy('name')
         .then(rows=>{
             res.status(200).json(rows);
         }).catch(err=>{
@@ -24,11 +26,65 @@ router.get('/:id/team/new',middleware.isAdmin,(req,res)=>{     /* get new team f
         })
 });
 
+router.get('/:id/team/addmember',middleware.isAdmin,(req,res)=>{    /** get add new member to existing team */
+
+    let teamobj;
+    
+    knex('users')
+        .select('id','name')
+        .whereNull('safe_delete')
+        .orderBy('name')
+        .then(rows=>{
+            // res.status(200).json(rows);
+            teamobj = rows;
+            knex('teams')
+                .select('id','name')
+                .whereNull('safe_delete')
+                .orderBy('name')
+                .then(rows=>{
+                    res.json({
+                        teamobj,
+                        rows
+                    })
+                })
+        }).catch(err=>{
+            console.log("team error 0");
+            Sentry.captureException(err);
+            res.status(404).json({
+                message: "data not found."
+            });
+        })
+})
+
+router.post('/:id/team/addmember',middleware.isAdmin,(req,res)=>{       /** post(add) new user member to any existing team */
+    let {teamId,userId} = req.body;
+
+    knex('team_members')
+        .insert({
+            team_id: teamId,
+            user_id: userId
+        })
+        .then(rows=>{
+            res.statusMessage = "team member added"
+            res.status(201).json({
+                message: "member added"
+            })
+        })
+        .catch(err=>{
+            Sentry.captureException(err)
+            res.status(400).json({
+                message: "unable to add user to the team"
+            })
+        })
+})
+
 router.post('/:id/team/new',middleware.isAdmin,(req,res)=>{             /* post new team */
 
     let name= req.body.name,
         description = req.sanitize(req.body.description),
         created_on = knex.fn.now();
+
+    
 
     knex('team')
         .insert({
@@ -61,6 +117,7 @@ router.get('/:id/team/all',middleware.isLoggedIn,(req,res)=>{                   
     knex('team_members')
         .join('team',{'team_members.team_id':'team.id'})
         .select('team.name','team.id','team.description')
+        .orderBy('team.name')
         .where({
             'team_members.user_id': req.params.id
         })

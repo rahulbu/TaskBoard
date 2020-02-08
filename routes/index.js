@@ -2,10 +2,26 @@ const router = require('express').Router(),
       passport = require('passport');
 const redisClient = require('./../db/redis');
 const jws = require('jws');
+const knex = require('./../db/index');
 
+const Sentry = require('@sentry/node');
+
+router.get('/',(req,res)=>{
+    knex('tasks')
+        .select('name','description','due_date')
+        .orderBy('due_date')
+        .then(rows=>{
+            res.json(rows)
+        })
+        .catch(err=>{
+            Sentry.captureException(err);
+            console.log(err)
+            res.sendStatus(404);
+        })
+})
 
 router.get('/login',(req,res)=>{
-    res.redirect("/");
+    res.redirect("/loginFile");
 });
 
 router.post('/login',passport.authenticate('local'),(req,res)=>{
@@ -21,8 +37,10 @@ router.post('/login',passport.authenticate('local'),(req,res)=>{
         secret: "secret key"
     })
     redisClient.setex(req.user.id,60*60,token,(err,rep)=>{
-        if(err)
+        if(err){
             console.log(err)
+            Sentry.captureException(err)
+        }
         else 
             console.log("pushed to redis");
     })

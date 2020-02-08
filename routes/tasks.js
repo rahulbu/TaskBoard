@@ -1,21 +1,32 @@
 const router = require('express').Router();
 const knex = require('./../db/index');
 var middleware = require('./../middleware/index');
+const customFunctions = require('./../middleware/customFunctions');
 const mailWorker = require('./../middleware/mailWorker');
+
+const Sentry = require('@sentry/node');
+
 
 router.get('/:id/tasks',middleware.isLoggedIn,(req,res)=>{      /** get all [to-do, in-progress, completed] tasks assigned to the user  */
     
+
+    // let {sort,filter} = req.query;
+    // let {offset,limit} = req.query;
+
     knex('tasks')
         .where({
             assignee: req.params.id
         })
         .whereNull('safe_delete')
-        .select('name','priority','description','progress','progress_recorded_on','due_date','assignee','report_to')
+        // .groupBy('priority')
+        .orderBy('due_date')
+        .select('id','name','priority','description','progress','progress_recorded_on','due_date','assignee','report_to')
         .then(rows=>{
             res.status(200).json(rows);
         })
         .catch(error=>{
             console.log("tasks error 1");
+            Sentry.captureException(error)
             res.sendStatus(404);
         })
 });
@@ -29,17 +40,23 @@ router.get('/:id/tasks/all',middleware.isLoggedIn,(req,res)=>{      /** get all 
             report_to: req.params.id
         })
         .whereNull('safe_delete')
+        .groupBy('priority')
+        .orderBy('due_date')
+        .select('id','name','priority','description','progress','progress_recorded_on','due_date','assignee','report_to')
         .then(rows=>{
             res.status(200).json(rows);
         })
         .catch(error=>{
             console.log("tasks error 2");
+            Sentry.captureException(error)
             res.sendStatus(404)
         })
 })
 
 router.get('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{      /**  get the new task page */
     res.send("new task form");
+
+
 });
 
 router.post('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{     /** post new task */
@@ -52,6 +69,9 @@ router.post('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{     /** post new
         assignee = req.body.assignee,
         reportTo = req.params.id;
         progressRecordedOn = knex.fn.now();
+
+        if(customFunctions.verifyCategory(priority,["high","low","normal"])){
+
         knex('tasks')
             .insert({
                 name: name,
@@ -79,8 +99,18 @@ router.post('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{     /** post new
             }).catch(error=>{
                 console.log("tasks error 3");
                 console.log(error)
-                res.sendStatus(400);
+                Sentry.captureException(error)
+                res.statusMessage="internal error"
+                res.status(400).json({
+                    message: "unable to create team."
+                });
             })
+        }else{
+            res.statusMessage = "invalid input"
+            res.status(400).json({
+                message: "invalid priority option"
+            })
+        }
 });
 
 router.get('/:id/tasks/team/:teamId',middleware.isLoggedIn,(req,res)=>{   /** get tasks assigned to the team members */
@@ -96,6 +126,7 @@ router.get('/:id/tasks/team/:teamId',middleware.isLoggedIn,(req,res)=>{   /** ge
             res.status(200).json(rows);
         }).catch(error=>{
             console.log("tasks error 4");
+            Sentry.captureException(error)
             res.sendStatus(404);
         })
 });
@@ -109,10 +140,12 @@ router.get('/:id/tasks/:task_id',middleware.isLoggedIn,(req,res)=>{     /** get 
         })
         .orWhere({id : req.params.task_id, report_to: req.params.id})
         .whereNull('safe_delete')
+        .select('id','name','priority','description','progress','progress_recorded_on','due_date','assignee','report_to')
         .then(rows=>{
             res.status(200).json(rows);
         }).catch(error=>{
             console.log("tasks error 5");
+            Sentry.captureException(error)
             res.sendStatus(404);
         });
 });
@@ -122,10 +155,12 @@ router.get('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{      
     knex('tasks')
         .where({id: req.params.task_id})
         .whereNull('safe_delete')
+        .select('name','priority','description','progress','progress_recorded_on','due_date','assignee','report_to')
         .then(rows=>{
             res.status(200).json(rows);
         }).catch(error=>{
             console.log("tasks error 6");
+            Sentry.captureException(error)
             res.sendStatus(404);
         })
 })
@@ -133,21 +168,33 @@ router.get('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{      
 router.put('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{      /** update[use put method] tasks */
 
     let progress = req.body.progress,
+        oldProgress = req.body.oldProgress,
         progressRecordedOn = knex.fn.now();
-
-    knex('tasks')
-        .update({
-            progress: progress,
-            progress_recorded_on: progressRecordedOn
+    if(!customFunctions.checkProgress(progress,oldProgress)){
+        res.statusMessage = "invalid progress update"
+        res.status(400).json({
+            message: "progress cannot be reverted"
         })
-        .where({id: req.params.task_id})
-        .whereNull('safe_delete')
-        .then(rows=>{
-            res.sendStatus(204);
-        }).catch(error=>{
-            console.log("tasks error 7");
-            res.sendStatus(400);
-        })
+    }
+    else{
+        knex('tasks')
+            .update({
+                progress: progress,
+                progress_recorded_on: progressRecordedOn
+            })
+            .where({id: req.params.task_id})
+            .whereNull('safe_delete')
+            .then(rows=>{
+                res.sendStatus(204);
+            }).catch(error=>{
+                console.log("tasks error 7");
+                Sentry.captureException(error)
+                res.statusMessage = "cannot update. internal error"
+                res.status(400).json({
+                    message: "unable to update progress."
+                });
+            })
+    }
 });
 
 
