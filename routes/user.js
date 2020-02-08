@@ -8,12 +8,12 @@ const router = require('express').Router(),
 
       const Sentry = require('@sentry/node');
 
-router.get('/:id/new',middleware.isAdmin,(req,res)=>{
+router.get('/:id/new',middleware.isAdmin,(req,res)=>{   /** get new user form */
     
     res.redirect("/"+req.params.id+"/userNew");
 })
 
-router.post('/:id/new',middleware.isAdmin,(req,res)=>{
+router.post('/:id/new',middleware.isAdmin,(req,res)=>{      /** post-method new user  */
 
     let email = req.body.email;
     
@@ -54,8 +54,8 @@ router.post('/:id/new',middleware.isAdmin,(req,res)=>{
                 
                 Sentry.captureException(error)
 
-                console.log("user error 1");
-                console.log(error);
+                // console.log("user error 1");
+                // console.log(error);
                 res.status(400).json({
                     message: "couldn't create user. duplicate user id or invalid credentials."
                 })
@@ -69,7 +69,7 @@ router.post('/:id/new',middleware.isAdmin,(req,res)=>{
     })
 })
 
-router.get('/:id',middleware.isLoggedIn,(req,res)=>{
+router.get('/:id',middleware.isLoggedIn,(req,res)=>{        /** get user details/profile */
     knex('users')
         .whereNull('safe_delete')
         .select('id','name','phone','email','role','designation')
@@ -86,7 +86,7 @@ router.get('/:id',middleware.isLoggedIn,(req,res)=>{
         });
 });
 
-router.get('/:id/edit',middleware.isLoggedIn,(req,res)=>{
+router.get('/:id/edit',middleware.isLoggedIn,(req,res)=>{       /** get page for editing user details, use the sent details to display as values in the form */
     
 
     knex('user')
@@ -103,7 +103,7 @@ router.get('/:id/edit',middleware.isLoggedIn,(req,res)=>{
     });
 });
 
-router.put('/:id/edit',middleware.isLoggedIn,(req,res)=>{
+router.put('/:id/edit',middleware.isLoggedIn,(req,res)=>{       /** update[use put method] user details - name,phone,email,designation */
 
     let id = req.params.id,
         { name,phone,email,designation} = req.body;
@@ -122,7 +122,7 @@ router.put('/:id/edit',middleware.isLoggedIn,(req,res)=>{
             })
 })
 
-router.put('/:id/changePassword',middleware.isLoggedIn,(req,res)=>{
+router.put('/:id/changePassword',middleware.isLoggedIn,(req,res)=>{     /** update [use put method]  */
     
     let oldPassword = req.body.oldPassword,
         newPassword = req.body.newPassword;

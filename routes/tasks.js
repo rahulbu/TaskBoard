@@ -3,7 +3,7 @@ const knex = require('./../db/index');
 var middleware = require('./../middleware/index');
 const mailWorker = require('./../middleware/mailWorker');
 
-router.get('/:id/tasks',middleware.isLoggedIn,(req,res)=>{
+router.get('/:id/tasks',middleware.isLoggedIn,(req,res)=>{      /** get all [to-do, in-progress, completed] tasks assigned to the user  */
     
     knex('tasks')
         .where({
@@ -20,7 +20,7 @@ router.get('/:id/tasks',middleware.isLoggedIn,(req,res)=>{
         })
 });
 
-router.get('/:id/tasks/all',middleware.isLoggedIn,(req,res)=>{
+router.get('/:id/tasks/all',middleware.isLoggedIn,(req,res)=>{      /** get all tasks where the user is either assignee or report_to */
     knex('tasks')
         .where({
             assignee: req.params.id
@@ -38,11 +38,11 @@ router.get('/:id/tasks/all',middleware.isLoggedIn,(req,res)=>{
         })
 })
 
-router.get('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{
+router.get('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{      /**  get the new task page */
     res.send("new task form");
 });
 
-router.post('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{
+router.post('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{     /** post new task */
 
     let name = req.body.name,
         priority = req.body.priority,
@@ -83,15 +83,15 @@ router.post('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{
             })
 });
 
-router.get('/:id/tasks/team/:teamId',middleware.isLoggedIn,(req,res)=>{   ////////////////query not proper
+router.get('/:id/tasks/team/:teamId',middleware.isLoggedIn,(req,res)=>{   /** get tasks assigned to the team members */
     knex('team_members')
         .where({
             "team_members.team_id": req.params.teamId
         })
         .join('users',{'users.id':'team_members.user_id'})
         .join('tasks',{'team_members.user_id':'tasks.assignee'})
-        .select('users.name','tasks.name','tasks.description','tasks.progress')
-        .whereIn('report_to', knex.select('user_id').from('team_members').where({team_id: req.params.teamId}))
+        .select('users.name','tasks.name','tasks.description','tasks.progress','tasks.due_date')
+        // .whereIn('report_to', knex.select('user_id').from('team_members').where({team_id: req.params.teamId}))
         .then(rows=>{
             res.status(200).json(rows);
         }).catch(error=>{
@@ -100,7 +100,7 @@ router.get('/:id/tasks/team/:teamId',middleware.isLoggedIn,(req,res)=>{   //////
         })
 });
 
-router.get('/:id/tasks/:task_id',middleware.isLoggedIn,(req,res)=>{
+router.get('/:id/tasks/:task_id',middleware.isLoggedIn,(req,res)=>{     /** get details of a particular task */
    
     knex('tasks')
         .where({
@@ -117,7 +117,7 @@ router.get('/:id/tasks/:task_id',middleware.isLoggedIn,(req,res)=>{
         });
 });
 
-router.get('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{
+router.get('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{      /** get update task page */
     
     knex('tasks')
         .where({id: req.params.task_id})
@@ -130,7 +130,7 @@ router.get('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{
         })
 })
 
-router.put('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{
+router.put('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{      /** update[use put method] tasks */
 
     let progress = req.body.progress,
         progressRecordedOn = knex.fn.now();

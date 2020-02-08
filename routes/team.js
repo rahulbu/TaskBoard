@@ -3,7 +3,7 @@ const router= require('express').Router();
 const middleware = require('./../middleware/index');
 
 
-router.get('/:id/team/new',middleware.isAdmin,(req,res)=>{
+router.get('/:id/team/new',middleware.isAdmin,(req,res)=>{     /* get new team form  */
     // res.send("new team creation page");
     
     
@@ -19,7 +19,7 @@ router.get('/:id/team/new',middleware.isAdmin,(req,res)=>{
         })
 });
 
-router.post('/:id/team/new',middleware.isAdmin,(req,res)=>{
+router.post('/:id/team/new',middleware.isAdmin,(req,res)=>{             /* post new team */
 
     let name= req.body.name,
         description = req.sanitize(req.body.description),
@@ -48,10 +48,10 @@ router.post('/:id/team/new',middleware.isAdmin,(req,res)=>{
         })
 });
 
-router.get('/:id/team/all',middleware.isLoggedIn,(req,res)=>{
+router.get('/:id/team/all',middleware.isLoggedIn,(req,res)=>{                   /** get all teams of the user */
     knex('team_members')
         .join('team',{'team_members.team_id':'team.id'})
-        .select('team.name','team.id')
+        .select('team.name','team.id','team.description')
         .where({
             'team_members.user_id': req.params.id
         })
@@ -65,11 +65,11 @@ router.get('/:id/team/all',middleware.isLoggedIn,(req,res)=>{
         })
 })
 
-router.get('/:id/team/:team_id',middleware.isLoggedIn,(req,res)=>{
+router.get('/:id/team/:team_id',middleware.isLoggedIn,(req,res)=>{      /** get specific team details */
     knex('team_members')
         .join('users',{'users.id':'team_members.user_id'})
         .join('team',{'team.id':'team_members.team_id'})
-        .select('users.name','team.name')
+        .select('users.id','users.name','team.name','team.description')
         .whereNull('team_members.safe_delete')
         .where({
             'team_members.team_id' : req.params.team_id
@@ -81,7 +81,7 @@ router.get('/:id/team/:team_id',middleware.isLoggedIn,(req,res)=>{
         })
 });
 
-router.delete('/:id/team/:team_id/delete',middleware.isAdmin,(req,res)=>{
+router.delete('/:id/team/:team_id/delete',middleware.isAdmin,(req,res)=>{   /** delete[update safe_delete] team  */
     knex('tasks')
         .update({ safe_delete: knex.fn.now()})
         .where({ id: req.params.team_id})
