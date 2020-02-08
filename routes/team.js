@@ -2,6 +2,8 @@ const knex = require('./../db/index');
 const router= require('express').Router();
 const middleware = require('./../middleware/index');
 
+const Sentry = require('@sentry/node');
+
 
 router.get('/:id/team/new',middleware.isAdmin,(req,res)=>{     /* get new team form  */
     // res.send("new team creation page");
@@ -15,7 +17,10 @@ router.get('/:id/team/new',middleware.isAdmin,(req,res)=>{     /* get new team f
             res.status(200).json(rows);
         }).catch(err=>{
             console.log("team error 0");
-            res.sendStatus(404);
+            Sentry.captureException(err);
+            res.status(404).jsone({
+                message: "data not found."
+            });
         })
 });
 
@@ -44,7 +49,11 @@ router.post('/:id/team/new',middleware.isAdmin,(req,res)=>{             /* post 
                 })
         }).catch(error=>{
             console.log("team error 2");
-            res.sendStatus(400);
+            Sentry.captureException(error);
+            res.statusMessage = "can not create team. internal error"
+            res.status(400).json({
+                message: "ERROR! cannot create team."
+            });
         })
 });
 
@@ -55,13 +64,17 @@ router.get('/:id/team/all',middleware.isLoggedIn,(req,res)=>{                   
         .where({
             'team_members.user_id': req.params.id
         })
-        .whereNull('safe_delete')
+        .whereNull('team_members.safe_delete')
         .then(rows=>{
             res.status(200).json(rows)
         })
         .catch(err=>{
             console.log(err);
-            res.sendStatus(404);
+            Sentry.captureException(err);
+            res.statusMessage = "teams not found. internal error"
+            res.status(404).json({
+                message: "data not found. contact admin"
+            });
         })
 })
 
@@ -77,7 +90,11 @@ router.get('/:id/team/:team_id',middleware.isLoggedIn,(req,res)=>{      /** get 
             res.status(200).json(rows);
         }).catch(err=>{
             console.log("team error 3");
-            res.sendStatus(404);
+            Sentry.captureException(err);
+            res.statusMessage = "team not found. internal error"
+            res.status(404).json({
+                message: "data not found. contact admin"
+            });
         })
 });
 
@@ -90,7 +107,11 @@ router.delete('/:id/team/:team_id/delete',middleware.isAdmin,(req,res)=>{   /** 
             res.sendStatus(204);
         }).catch(error=>{
             console.log("team error 4");
-            res.sendStatus(400);
+            Sentry.captureException(error);
+            res.statusMessage = "team not found. internal error"
+            res.status(400).json({
+                message: "data not found. contact admin"
+            });
         })
 });
 
