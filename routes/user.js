@@ -5,6 +5,9 @@ const router = require('express').Router(),
       crypto = require('crypto'),
       knex = require('../db/index');
 
+
+      const Sentry = require('@sentry/node');
+
 router.get('/:id/new',middleware.isAdmin,(req,res)=>{
     
     res.redirect("/"+req.params.id+"/userNew");
@@ -49,6 +52,8 @@ router.post('/:id/new',middleware.isAdmin,(req,res)=>{
 
             }).catch(error=>{
                 
+                Sentry.captureException(error)
+
                 console.log("user error 1");
                 console.log(error);
                 res.status(400).json({
@@ -75,7 +80,8 @@ router.get('/:id',middleware.isLoggedIn,(req,res)=>{
         }).catch(error=>{
             console.log('no such record');
             console.log("user error 2");
-            console.log(error);
+            // console.log(error);
+            Sentry.captureException(error);
             res.sendStatus(404);
         });
 });
@@ -141,6 +147,7 @@ router.put('/:id/changePassword',middleware.isLoggedIn,(req,res)=>{
         }).catch(error=>{
             console.log("error in password");
             console.log("user error 5");
+            Sentry.captureException(error)
             res.sendStatus(400);
         })
 
@@ -155,6 +162,7 @@ router.delete('/:id/delete',middleware.isAdmin,(req,res)=>{
         .then(rows=>{
             res.sendStatus(204)
         }).catch(err=>{
+            Sentry.captureException(err)
             res.sendStatus(400);
             console.log("user error 6");
         });

@@ -95,10 +95,7 @@ app.get('/:id/userNew',(req,res)=>{
     res.sendFile(__dirname+"/newUser.html")
 })
 
-app.get('*',(req,res)=>{
-    res.redirect("/");
-});
-
+// app.use(Sentry.Handlers.errorHandler());
 
 app.use(Sentry.Handlers.errorHandler({
     shouldHandleError(error) {
@@ -109,6 +106,11 @@ app.use(Sentry.Handlers.errorHandler({
       return false
     }
   }));
+
+
+app.get('*',(req,res)=>{
+    res.redirect("/");
+});
 
 
 app.listen( process.env.PORT , process.env.IP,(error)=>{
