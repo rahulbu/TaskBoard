@@ -16,6 +16,12 @@ router.get('/:id/new',middleware.isAdmin,(req,res)=>{   /** get new user form */
 router.post('/:id/new',middleware.isAdmin,(req,res)=>{      /** post-method new user  */
 
     let email = req.body.email;
+
+    let id = req.body.id,
+    name = req.body.name,
+    phone = req.body.phone,
+    designation = req.body.designation,
+    role = req.body.role;
     
      mailWorker.verifier.verify(email,(err,data)=>{
         if(err){
@@ -36,12 +42,8 @@ router.post('/:id/new',middleware.isAdmin,(req,res)=>{      /** post-method new 
             })
         }
         else{
-            let id = req.body.id,
-            name = req.body.name,
-            phone = req.body.phone,
-            designation = req.body.designation,
-            role = req.body.role,
-            salt = crypto.randomBytes(4).toString('hex'),
+
+            let salt = crypto.randomBytes(4).toString('hex'),
             pass = crypto.randomBytes(4).toString('hex'),
             password = crypto.pbkdf2Sync(pass,salt,100,128,'sha512').toString('hex');
 
