@@ -91,7 +91,7 @@ router.get('/:id/tasks/team/:teamId',middleware.isLoggedIn,(req,res)=>{   /** ge
         .join('users',{'users.id':'team_members.user_id'})
         .join('tasks',{'team_members.user_id':'tasks.assignee'})
         .select('users.name','tasks.name','tasks.description','tasks.progress','tasks.due_date')
-        // .whereIn('report_to', knex.select('user_id').from('team_members').where({team_id: req.params.teamId}))
+        .whereIn('report_to', knex.select('user_id').from('team_members').where({team_id: req.params.teamId}))
         .then(rows=>{
             res.status(200).json(rows);
         }).catch(error=>{
