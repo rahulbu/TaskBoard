@@ -7,7 +7,9 @@ const express = require('express'),
     expressSanitizer = require('express-sanitizer'),
     methodOverride = require('method-override'),
     knex = require('./db/index'),
+    redisClient = require('./db/redis'),
     customFunctions = require('./middleware/customFunctions'),
+    redisStore = require('connect-redis')(expressSession),
     app = express();
     
 const Sentry = require('@sentry/node');
@@ -31,6 +33,7 @@ app.use(expressSanitizer());
 app.use(methodOverride("__method"));
 
 app.use(expressSession({
+    store: new redisStore({client: redisClient}) ,
     secret: "hola",
     resave: false,
     saveUninitialized: false,

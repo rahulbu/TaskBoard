@@ -9,10 +9,8 @@ const router = require('express').Router(),
       const Sentry = require('@sentry/node');
 
 router.get('/:id/new',middleware.isAdmin,(req,res)=>{   /** get new user form */
-    let url = req.hostname+"/"+req.params.id+"/userNew";
-    console.log(url)
-    res.send("click <a href='"+url+"'>here</a>")
-    // res.redirect("/"+req.params.id+"/userNew");
+   
+    res.redirect("/"+req.params.id+"/userNew");
 })
 
 router.post('/:id/new',middleware.isAdmin,(req,res)=>{      /** post-method new user  */
