@@ -108,7 +108,7 @@ router.get('/:id',middleware.isLoggedIn,(req,res)=>{        /** get user details
 router.get('/:id/edit',middleware.isLoggedIn,(req,res)=>{       /** get page for editing user details, use the sent details to display as values in the form */
     
 
-    knex('user')
+    knex('users')
     .select('name','phone','email','designation')
     .whereNull('safe_delete')
     .where({

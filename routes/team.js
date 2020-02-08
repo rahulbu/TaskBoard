@@ -37,7 +37,7 @@ router.get('/:id/team/addmember',middleware.isAdmin,(req,res)=>{    /** get add 
         .then(rows=>{
             // res.status(200).json(rows);
             teamobj = rows;
-            knex('teams')
+            knex('team')
                 .select('id','name')
                 .whereNull('safe_delete')
                 .orderBy('name')
@@ -46,6 +46,11 @@ router.get('/:id/team/addmember',middleware.isAdmin,(req,res)=>{    /** get add 
                         teamobj,
                         rows
                     })
+                })
+                .catch(err=>{
+                    Sentry.captureException(err)
+                    console.log(err)
+                    res.sendStatus(400)
                 })
         }).catch(err=>{
             console.log("team error 0");
