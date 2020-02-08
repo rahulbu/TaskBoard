@@ -91,7 +91,7 @@ app.use('/user',teamRoutes);
 app.get('/loginFile',(req,res)=>{
     res.sendFile(__dirname+"/login.html")
 })
-app.get('user/:id/userNew',(req,res)=>{
+app.get('/:id/userNew',(req,res)=>{
     res.sendFile(__dirname+"/newUser.html")
 })
 
