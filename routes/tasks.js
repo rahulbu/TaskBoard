@@ -40,8 +40,7 @@ router.get('/:id/tasks/all',middleware.isLoggedIn,(req,res)=>{      /** get all 
             report_to: req.params.id
         })
         .whereNull('safe_delete')
-        .groupBy('priority')
-        .orderBy('due_date')
+        .orderBy(['priority',{column: 'due_date'}])
         .select('id','name','priority','description','progress','progress_recorded_on','due_date','assignee','report_to')
         .then(rows=>{
             res.status(200).json(rows);
