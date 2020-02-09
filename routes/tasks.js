@@ -115,13 +115,13 @@ router.post('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{     /** post new
 
 router.get('/:id/tasks/team/:teamId',middleware.isLoggedIn,(req,res)=>{   /** get tasks assigned to the team members */
     knex('team_members')
-        .where({
-            "team_members.team_id": req.params.teamId
-        })
         .join('users',{'users.id':'team_members.user_id'})
         .join('tasks',{'team_members.user_id':'tasks.assignee'})
         .select('users.name','tasks.name','tasks.description','tasks.progress','tasks.assignee','tasks.report_to','tasks.due_date')
-        .whereIn('report_to', knex.select('user_id').from('team_members').where({team_id: req.params.teamId}))
+        .where({
+            "team_members.team_id": req.params.teamId
+        })
+        .whereIn('tasks.report_to', knex.select('user_id').from('team_members').where({team_id: req.params.teamId}))
         .then(rows=>{
             res.status(200).json(rows);
         }).catch(error=>{
