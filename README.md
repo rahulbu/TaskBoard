@@ -17,6 +17,10 @@ The requirements for the application can be found in the [wiki](https://github.c
 
 ![ER diagram](https://github.com/rahulbu/TaskBoard/blob/master/task-line.png)
 
+### API documentation
+
+The API documentation can be found [here](https://documenter.getpostman.com/view/10203641/SWTHbb5z)
+
 ### Tools and Tech
 
 * Node.js
@@ -38,4 +42,4 @@ The requirements for the application can be found in the [wiki](https://github.c
 
 1. Configure and populate the database.
 2. Run 'npm install' to install all the dependencies.
-3. Run 'node app.js' to start the server in default port.
+3. Configure the port, and Run 'node app.js' to start the server.
