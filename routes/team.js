@@ -144,7 +144,7 @@ router.get('/:id/team/:team_id',middleware.isLoggedIn,(req,res)=>{      /** get 
     knex('team_members')
         .join('users',{'users.id':'team_members.user_id'})
         .join('team',{'team.id':'team_members.team_id'})
-        .select('users.id','users.Name','team.name','team.description')
+        .select('users.id','users.name','team.Name','team.description')
         .whereNull('team_members.safe_delete')
         .where({
             'team_members.team_id' : req.params.team_id
@@ -153,6 +153,7 @@ router.get('/:id/team/:team_id',middleware.isLoggedIn,(req,res)=>{      /** get 
         }).catch(err=>{
             console.log("team error 3");
             Sentry.captureException(err);
+            console.log(err)
             res.statusMessage = "team not found. internal error"
             res.status(404).json({
                 message: "data not found. contact admin"
