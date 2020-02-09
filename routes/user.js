@@ -128,7 +128,9 @@ router.put('/:id/edit',middleware.isLoggedIn,(req,res)=>{       /** update[use p
     let id = req.params.id,
         { name,phone,email,designation} = req.body;
 
-        knew('users')
+        
+
+        knex('users')
             .where({id: id})
             .whereNull('safe_delete')
             .update({
