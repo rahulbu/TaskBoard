@@ -159,11 +159,11 @@ router.put('/:id/changePassword',middleware.isLoggedIn,(req,res)=>{     /** upda
         .whereNull('safe_delete')
         .select('salt','password')
         .then(rows=>{
-            if(rows[0].password == crypto.pbkdf2Sync(oldPassword,rows.salt,100,128,'sha512').toString('hex')){
+            if(rows[0].password == crypto.pbkdf2Sync(oldPassword,rows[0].salt,100,128,'sha512').toString('hex')){
                 knex('users')
                     .where({ id: req.params.id})
                     .update({
-                        password: crypto.pbkdf2Sync(newPassword,salt,100,128,'sha512').toString('hex')
+                        password: crypto.pbkdf2Sync(newPassword,rows[0].salt,100,128,'sha512').toString('hex')
                     }).then(rows=>{
                         res.sendStatus(204);
                     })
