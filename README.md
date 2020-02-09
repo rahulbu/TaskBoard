@@ -11,7 +11,7 @@ A webapp for managing tasks. It allows users to view the list of tasks assigned 
 
 ### Requirements
 
-The requirements for the application can be found in the [wiki](https://github.com/rahulbu/TaskBoard/wiki/Requirements).
+The requirements for the application can be found in the [wiki](https://github.com/rahulbu/TaskBoard/wiki/).
 
 ### ER Diagram
 
