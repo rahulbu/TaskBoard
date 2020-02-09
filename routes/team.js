@@ -161,9 +161,12 @@ router.get('/:id/team/:team_id',middleware.isLoggedIn,(req,res)=>{      /** get 
 });
 
 router.delete('/:id/team/:team_id/delete',middleware.isAdmin,(req,res)=>{   /** delete[update safe_delete] team  */
-    knex('tasks')
+    
+    let {teamId} = req.params;
+
+    knex('team')
         .update({ safe_delete: knex.fn.now()})
-        .where({ id: req.params.team_id})
+        .where({ id: teamId})
         .whereNull("safe_delete")
         .then(rows=>{
             res.sendStatus(204);

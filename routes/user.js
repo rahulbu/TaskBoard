@@ -179,10 +179,12 @@ router.put('/:id/changePassword',middleware.isLoggedIn,(req,res)=>{     /** upda
 
 router.delete('/:id/delete',middleware.isAdmin,(req,res)=>{
     
+    let {userId} = req.params;
+
     knex('users')
         .update({safe_delete: knex.fn.now()})
         .whereNull('safe_delete')
-        .where({id: req.params.id})
+        .where({id: userId})
         .then(rows=>{
             res.sendStatus(204)
         }).catch(err=>{
