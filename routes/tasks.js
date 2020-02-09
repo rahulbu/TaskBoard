@@ -153,7 +153,7 @@ router.get('/:id/tasks/:task_id',middleware.isLoggedIn,(req,res)=>{     /** get 
 router.get('/:id/tasks/:task_id/update',middleware.isLoggedIn,(req,res)=>{      /** get update task page */
     
     knex('tasks')
-        .where({id: req.params.task_id})
+        .where({id: req.params.task_id, assignee: req.params.id})
         .whereNull('safe_delete')
         .select('name','priority','description','progress','progress_recorded_on','due_date','assignee','report_to')
         .then(rows=>{

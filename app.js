@@ -34,7 +34,7 @@ app.use(methodOverride("__method"));
 
 app.use(expressSession({
     store: new redisStore({client: redisClient}) ,
-    secret: "hola",
+    secret: "nothing here",
     resave: false,
     saveUninitialized: false,
 }))
@@ -102,7 +102,6 @@ app.get('/:id/userNew',(req,res)=>{
 
 app.use(Sentry.Handlers.errorHandler({
     shouldHandleError(error) {
-      // Capture all 404 and 500 errors
       if (error.status === 404 || error.status === 500 || error.status === 401 || error.status === 400) {
         return true
       }
