@@ -81,6 +81,7 @@ app.use(function(req,res,next){
     // res.locals.error = req.flash("error","");
     // res.locals.success = req.flash("success","");
     res.header("Access-Control-Allow-Origin", "*");
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
     next();
@@ -90,14 +91,6 @@ app.use('/',indexRoutes);
 app.use('/user',tasksRoutes);
 app.use('/user',userRoutes);
 app.use('/user',teamRoutes);
-
-
-app.get('/loginFile',(req,res)=>{
-    res.sendFile(__dirname+"/login.html")
-})
-app.get('/:id/userNew',(req,res)=>{
-    res.sendFile(__dirname+"/newUser.html")
-})
 
 // app.use(Sentry.Handlers.errorHandler());
 
@@ -112,7 +105,8 @@ app.use(Sentry.Handlers.errorHandler({
 
 
 app.get('*',(req,res)=>{
-    res.redirect("/");
+    // res.redirect("/");
+    res.send("<h2>use proper path</h2>")
 });
 
 
