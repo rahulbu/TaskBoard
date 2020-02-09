@@ -8,6 +8,7 @@ A webapp for managing tasks. It allows users to view the list of tasks assigned 
 
 * User Invite Via Email
 * New Task Notification
+* Team invite Via Email
 
 ### Requirements
 
