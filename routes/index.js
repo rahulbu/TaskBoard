@@ -52,12 +52,15 @@ router.post('/login',passport.authenticate('local'),(req,res)=>{
 
 router.get('/user/:id/logout',(req,res)=>{
     req.logOut();
-    // redisClient.del(req.params.id,(err,reply)=>{
-    //     console.log(reply)
-    // })
+    let message = "logout"
+    redisClient.del(req.params.id,(err,reply)=>{
+        if(err)
+            message="couldn't end the session"
+        console.log(reply)
+    })
     console.log('logged out');
     res.status(200).json({
-        message: "logout"
+        message: message
     })
 });
 
