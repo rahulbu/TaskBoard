@@ -54,9 +54,21 @@ router.get('/:id/tasks/all',middleware.isLoggedIn,(req,res)=>{      /** get all 
 })
 
 router.get('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{      /**  get the new task page */
-    res.send("new task form");
+    // res.send("new task form");
 
-
+    knex('users')
+        .select('id','name')
+        .whereNull('safe_delete')
+        .then(rows=>{
+            res.json(rows)
+        })
+        .catch(err=>{
+            Sentry.captureException(err);
+            console.log(err)
+            res.status(400).json({
+                message: "cannot find users"
+            })
+        })
 });
 
 router.post('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{     /** post new task */
