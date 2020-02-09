@@ -17,6 +17,10 @@ The requirements for the application can be found in the [wiki](https://github.c
 
 ![ER diagram](https://github.com/rahulbu/TaskBoard/blob/master/task-line.png)
 
+### API documentation
+
+The API documentation can be found [here](https://documenter.getpostman.com/view/10203641/SWTHbb5z)
+
 ### Tools and Tech
 
 * Node.js
