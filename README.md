@@ -22,6 +22,7 @@ The requirements for the application can be found in the [wiki](https://github.c
 * Node.js
 * Express Framework
 * MySQL
+* Knex
 * Redis
 * Sentry
 
