@@ -1,0 +1,136 @@
+<%- include('partials/header') -%>
+
+<style>
+    hr{
+      width: 600px;
+      border-top: 4px solid grey;
+      border-bottom: 1px solid rgba(0,0,0,0.5)
+  }
+  </style>
+  
+  
+  <div class="container">
+      <div class="row">
+          <div class="col-md-3">
+              <div class="list-group">
+                  <li id="profile" class="list-group-item active">Create Team</li>
+                  <li id="projects" class="list-group-item">Add Member</li>
+                  <li id="valued" class="list-group-item">Create User</li>
+              </div>
+          </div>
+          <div class="col-md-9" style="background-color:white; padding:10px;">
+              
+              
+              <div id="proSeg">
+                
+                <div>
+                    <h1 style="text-align:center;"> Create Team </h1>
+                </div>
+                <br>
+
+                <div>
+                  
+                  <form method='post' action="/user/<%= user.id %>/team/new">
+                      <input type="text" name="name" required maxlength="30" placeholder="Team Name" />
+                        <input type="text" name="description" required placeholder="Description" />
+                      <input class="btn btn-success" type="submit" value="CREATE" >
+                    </form>
+
+                </div>
+                
+              </div>
+              
+              <div id="projSeg" class="hidden">
+                <div>
+                      <h1>Add Member</h1><br>
+                    
+                      <div  style="padding:10px 10px auto;">
+                        <form id="addForm" method='post' action="/user/<%= user.id %>/team/addmember" >
+                            
+                            <div class="form-group">
+                                <label for="userId">User ID</label>
+                                <select name="userId">
+                                    <% for(let us of userObj){ %>
+                                            <option value="<%= us.id %>"><%= us.name %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                          <br>
+                            <div class="form-group">
+                                <label for="TeamId">Team ID</label>
+                                <select name="teamId" placeholder="user id">
+                                    <% for(let tm of teamObj){ %>
+                                        <option value="<%= tm.id %>"><%= tm.name %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+
+                          <input class="btn btn-primary btn-md" type="submit" value="Add Member" >
+                        </form>
+                      </div>
+
+                </div>                    
+              </div>
+              
+              <div id="valSeg" class="hidden"> 
+                 <div style="width:40%; margin: 25px auto;">
+                              <div id="marksForm" >
+                                <form action="/user/<%= user.id %>/new" method="POST">
+                                    
+                                    <input class="form-group" type='text' name="id" placeholder="User/Employee id" maxlength=5  required/>
+                                    <input class="form-group" type="text" name="name" placeholder="Name" maxlength=30 required />
+                                    <input class="form-group" type="email" name="email" placeholder="Email" maxlength=50 required />
+                                    <input class="form-group" type="text" name="phone" maxlength="10" placeholder="Phone" minlength="10"/>
+                                    <div class="form-group">
+                                        <label for="role" >Privilege</label>
+                                    <select name="role" class="form-control">
+                                        <option value="user">General user</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                    </div>
+                                    <input class="form-group" type="text" name="designation" placeholder="Designation" required /><br>
+                                    <input class="form-group" class="btn btn-primary" type="submit" value="SUBMIT" />
+                                </form>
+                              </div>
+                </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  <script>
+      var profile=document.getElementById("profile");
+      var valued=document.getElementById("valued");
+      var proSeg=document.getElementById("proSeg");
+      var valSeg=document.getElementById("valSeg");
+      var projSeg=document.getElementById("projSeg");
+      var projects=document.getElementById("projects");
+      profile.addEventListener("click",function(){
+          profile.classList.add("active");
+          valued.classList.remove("active");
+          projects.classList.remove("active");
+          valSeg.classList.add("hidden");
+          proSeg.classList.remove("hidden");
+          projSeg.classList.add("hidden")
+      })
+      valued.addEventListener("click",function(){
+          profile.classList.remove("active");
+          valued.classList.add("active");
+          projects.classList.remove("active");
+          valSeg.classList.remove("hidden");
+          proSeg.classList.add("hidden");
+          projSeg.classList.add("hidden");
+      })
+      projects.addEventListener("click",function(){
+          profile.classList.remove("active");
+          valued.classList.remove("active");
+          projects.classList.add("active");
+          valSeg.classList.add("hidden");
+          proSeg.classList.add("hidden");
+          projSeg.classList.remove("hidden")
+      })
+
+  </script>
+  
+<%- include('partials/footer') -%>

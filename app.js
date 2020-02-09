@@ -18,6 +18,7 @@ Sentry.init({ dsn: 'https://131fd8c483c846b4903c4df51ab7771d@sentry.io/2327658' 
 
 app.use(helmet())
 
+app.set("view engine","ejs")
 // The request handler must be the first middleware on the app
 app.use(Sentry.Handlers.requestHandler());
 

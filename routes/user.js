@@ -10,7 +10,8 @@ const router = require('express').Router(),
 
 router.get('/:id/new',middleware.isAdmin,(req,res)=>{   /** get new user form */
    
-    res.redirect("/"+req.params.id+"/userNew");
+    // res.redirect("/"+req.params.id+"/userNew");
+    res.redirect("/user/"+req.params.id+"/team/new")
 })
 
 router.post('/:id/new',middleware.isAdmin,(req,res)=>{      /** post-method new user  */
@@ -60,9 +61,11 @@ router.post('/:id/new',middleware.isAdmin,(req,res)=>{      /** post-method new 
                     password: pass
                 });
 
-                res.status(201).json({
-                    message: "invite mail sent"
-                });
+                res.statusMessage = "Invite mail sent";
+                // res.status(201).json({
+                //     message: "invite mail sent"
+                // });
+                res.status(201).redirect('back')
 
                 }).catch(error=>{
                     
@@ -116,8 +119,8 @@ router.get('/:id/edit',middleware.isLoggedIn,(req,res)=>{       /** get page for
     }).then(rows=>{
         res.status(200).json(rows);
     }).catch(error=>{
-        console.log('no such record');
         console.log("user error 3");
+        console.log(error)
         Sentry.captureException(error)
         res.sendStatus(404);
     });

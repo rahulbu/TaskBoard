@@ -2,6 +2,7 @@ const knex = require('./../db/index');
 const router= require('express').Router();
 const middleware = require('./../middleware/index');
 const customFunctions = require('./../middleware/customFunctions');
+const mailWorker = require('./../middleware/mailWorker');
 
 const Sentry = require('@sentry/node');
 
@@ -9,18 +10,30 @@ const Sentry = require('@sentry/node');
 router.get('/:id/team/new',middleware.isAdmin,(req,res)=>{     /* get new team form  */
     // res.send("new team creation page");
     
-    
+    let userObj;
     
     knex('users')
         .select('id','name')
         .whereNull('safe_delete')
         .orderBy('name')
         .then(rows=>{
-            res.status(200).json(rows);
+            // res.status(200).json(rows);
+            // res.render("team/new",{users:rows})
+
+            userObj = rows;
+
+            knex('team')
+                .select('id','name')
+                .whereNull('safe_delete')
+                .then(result=>{
+                    res.render("new",{userObj : userObj, teamObj : result})
+                })
+
         }).catch(err=>{
             console.log("team error 0");
+            console.log(err)
             Sentry.captureException(err);
-            res.status(404).jsone({
+            res.status(404).json({
                 message: "data not found."
             });
         })
@@ -70,10 +83,29 @@ router.post('/:id/team/addmember',middleware.isAdmin,(req,res)=>{       /** post
             user_id: userId
         })
         .then(rows=>{
+            
+            knex('users')
+                .select('email')
+                .where({
+                    id: userId
+                })
+                .whereNull('safe_delete')
+                .then(result=>{
+                    console.log(result)
+                    mailWorker.mailQueue.add({
+                        userMailId: result[0].email,
+                        subject: "Team invite",
+                    })
+                })
+                .catch(err=>{
+                    console.log(err);
+                })
+
             res.statusMessage = "team member added"
-            res.status(201).json({
-                message: "member added"
-            })
+            // res.status(201).json({
+            //     message: "member added"
+            // })
+            res.status(201).redirect('back');
         })
         .catch(err=>{
             Sentry.captureException(err)
@@ -100,14 +132,18 @@ router.post('/:id/team/new',middleware.isAdmin,(req,res)=>{             /* post 
         // .returning('id')
         .then(row_id=>{
             
-            let fieldsToInsert = req.body.users.map(field => 
-                ({ user_id: field, team_id: row_id })); 
+            // let fieldsToInsert = req.body.users.map(field => 
+            //     ({ user_id: field, team_id: row_id })); 
 
-            knex('team_members')
-                .insert(fieldsToInsert)
-                .then(rows=>{
-                    res.sendStatus(201);
-                })
+            // knex('team_members')
+            //     .insert(fieldsToInsert)
+            //     .then(rows=>{
+            //         res.sendStatus(201);
+            //     })
+            res.sendStatus(201)
+            res.statusMessage = "Team created"
+            res.status(201).redirect('back');
+            
         }).catch(error=>{
             console.log("team error 2");
             Sentry.captureException(error);

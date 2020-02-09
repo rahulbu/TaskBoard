@@ -21,7 +21,8 @@ router.get('/',(req,res)=>{
 })
 
 router.get('/login',(req,res)=>{
-    res.redirect("/loginFile");
+    // res.redirect("/loginFile");
+    res.render("login")
 });
 
 router.post('/login',passport.authenticate('local'),(req,res)=>{

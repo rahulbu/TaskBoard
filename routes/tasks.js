@@ -105,7 +105,8 @@ router.post('/:id/tasks/new',middleware.isLoggedIn,(req,res)=>{     /** post new
                         if(rows.length>0)
                             mailWorker.mailQueue.add({
                                 userMailId: rows[0].email,
-                                subject: "Task notification"
+                                subject: "Task notification",
+                                priority: priority
                             })
                     })
             }).catch(error=>{

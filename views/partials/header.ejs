@@ -1,0 +1,76 @@
+<html>
+    <head>
+        <title>TASK LINE</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.css" rel="stylesheet" type="text/css">
+        <!-- <link href="https://fonts.googleapis.com/css?family=Merienda" rel="stylesheet"> -->
+	    <!-- <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet"> -->
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link href="https://fonts.googleapis.com/css?family=Carter+One" rel="stylesheet">
+        <!-- <link href="https://fonts.googleapis.com/css?family=Roboto:700i" rel="stylesheet"> -->
+        <!-- <link href="https://fonts.googleapis.com/css?family=Raleway:700" rel="stylesheet"> -->
+        
+        <script src="https://code.jquery.com/jquery-2.1.4.min.js" integrity="sha256-8WqyJLuWKRBVhxXIL1jBDD7SDxU936oZkCnxQbWwJVw=" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+        <style type="text/css">
+		body{
+			padding: 2px;
+			/*background: #ecf0f1;*/
+			
+	background: url(https://images.unsplash.com/photo-1531824475211-72594993ce2a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1650&q=80);
+	background-size: cover;
+	background-position: center;
+	font-family: 'Carter';
+	font-weight : 100;
+	font-size : 2em;
+
+
+		}
+		.navbar-inverse{
+			background: black;
+		}
+		.navbar-inverse .navbar-nav>li>a{
+			color: white;
+		}
+		.navbar-inverse .navbar-brand{
+			color: white;
+		}
+	</style>
+        
+    </head>
+    <body>
+        <nav class="navbar sticky-top navbar-inverse">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#data" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+                    
+                    <a class="navbar-brand" href="/login">Home</a>
+    
+                </div>
+                
+                    
+                
+                <div class="collapse navbar-collapse" id="data">
+                    <ul class="nav navbar-nav navbar-right">
+                        <% if(!user) { %>
+                        
+                        <% } else { %>
+                            <li>
+                                <a href="">Admin privilege </a>
+                            </li>
+                            <li><a href="/user/<%= user.id %>/logout">Logout</a></li>
+                        <% } %>
+                    </ul>
+                </div>
+    
+            </div>
+        </nav>
+            
+     

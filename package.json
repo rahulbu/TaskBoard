@@ -15,6 +15,7 @@
     "body-parser": "^1.19.0",
     "bull": "^3.12.1",
     "connect-redis": "^4.0.4",
+    "ejs": "^3.0.1",
     "email-verifier": "^0.4.1",
     "express": "^4.17.1",
     "express-sanitizer": "^1.0.5",
