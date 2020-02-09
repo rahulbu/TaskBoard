@@ -6,12 +6,23 @@ A webapp for managing tasks. It allows users to view the list of tasks assigned 
 
 ### Requirements
 
+The requirements for the application can be found in the [wiki]().
+
 ### ER Diagram
 ![ER diagram](https://github.com/rahulbu/TaskBoard/blob/master/task-line.png)
 
 ### Tools and Tech
 
+* Node.js
+* Express Framework
+* MySQL
+* Redis
+* Sentry
+
 ## Usage
 
 ### Requirements
 
+1. Node.js
+2. MySQL
+3. Redis
