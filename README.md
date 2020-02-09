@@ -42,4 +42,4 @@ The API documentation can be found [here](https://documenter.getpostman.com/view
 
 1. Configure and populate the database.
 2. Run 'npm install' to install all the dependencies.
-3. Run 'node app.js' to start the server in default port.
+3. Configure the port, and Run 'node app.js' to start the server.
