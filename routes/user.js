@@ -122,7 +122,7 @@ router.get('/:id/edit',middleware.isLoggedIn,(req,res)=>{       /** get page for
         console.log("user error 3");
         console.log(error)
         Sentry.captureException(error)
-        res.sendStatus(404);
+        res.status(404).json();
     });
 });
 
@@ -145,7 +145,7 @@ router.put('/:id/edit',middleware.isLoggedIn,(req,res)=>{       /** update[use p
             .catch(err=>{
                 Sentry.captureException(err)
                 res.statusMessage = "unable to update"
-                res.sendStatus(400)
+                res.status(400).json();
             })
 })
 
@@ -165,19 +165,19 @@ router.put('/:id/changePassword',middleware.isLoggedIn,(req,res)=>{     /** upda
                     .update({
                         password: crypto.pbkdf2Sync(newPassword,rows[0].salt,100,128,'sha512').toString('hex')
                     }).then(rows=>{
-                        res.sendStatus(204);
+                        res.status(204).json();
                     })
             }
             else{
                 res.statusMessage = "password mismatch"
-                res.sendstatus(400);
+                res.status(400).end();
             }
         }).catch(error=>{
             console.log("error in password");
             console.log("user error 5");
             Sentry.captureException(error)
             res.statusMessage="unable to update password."
-            res.sendStatus(400);
+            res.status(400).end();
         })
 
 });
@@ -194,7 +194,7 @@ router.delete('/:id/delete',middleware.isAdmin,(req,res)=>{
             res.sendStatus(204)
         }).catch(err=>{
             Sentry.captureException(err)
-            res.sendStatus(400);
+            res.status(400).json();
             console.log("user error 6");
         });
 });

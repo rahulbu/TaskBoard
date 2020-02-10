@@ -130,7 +130,7 @@ router.get('/:id/tasks/team/:teamId',middleware.isLoggedIn,(req,res)=>{   /** ge
     knex('team_members')
         .join('users',{'users.id':'team_members.user_id'})
         .join('tasks',{'team_members.user_id':'tasks.assignee'})
-        .select('users.name','tasks.name','tasks.description','tasks.progress','tasks.assignee','tasks.report_to','tasks.due_date')
+        .select('users.name','tasks.name','tasks.description','tasks.progress','tasks.assignee','tasks.report_to','tasks.due_date','tasks.priority')
         .where({
             "team_members.team_id": req.params.teamId
         })
