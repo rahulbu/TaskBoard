@@ -22,7 +22,7 @@
     "express-session": "^1.17.0",
     "helmet": "^3.21.2",
     "jws": "^4.0.0",
-    "knex": "^0.20.8",
+    "knex": "^2.4.0",
     "method-override": "^3.0.0",
     "mysql": "^2.18.1",
     "passport": "^0.4.1",
